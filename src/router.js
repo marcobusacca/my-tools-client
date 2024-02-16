@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // IMPORTARE TUTTE LE PAGINE DALLA CARTELLA "PAGES"
+import TaskIndex from './pages/TaskIndex.vue';
 
 
 // CREIAMO IL ROUTER CON LE SUE ROTTE
@@ -12,7 +13,7 @@ const router = createRouter({
         {
             path: '/tasks',
             name: 'tasks',
-            component: TasksIndex,
+            component: TaskIndex,
         },
         // {
         //     path: '/:catchAll(.*)',
