@@ -1,8 +1,18 @@
 <script>
+import AppHeader from './components/AppHeader.vue';
+export default {
+  components: {
+    AppHeader,
+  },
+}
 </script>
 
 <template>
-  <h1>my-tools</h1>
+  <!-- COMPONENT: APP-HEADER -->
+  <app-header />
+  <main>
+    <router-view></router-view>
+  </main>
 </template>
 
 <style lang="scss">
