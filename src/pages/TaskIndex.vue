@@ -6,7 +6,8 @@ export default {
     data() {
         return {
             store,
-            tasks: [],
+            tasksNotDone: [],
+            tasksDone: [],
             tasksCategories: [],
         }
     },
@@ -19,11 +20,21 @@ export default {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
+            // SVUOTO GLI ARRAY DELLE TASKS
+            this.tasksNotDone = [];
+            this.tasksDone = [];
+
             // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DI TASKS
             axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
 
-                // SALVO IL RISULTATO IN TASKS
-                this.tasks = response.data;
+                // INSERISCO LE TASKS NEI RISPETTIVI ARRAY
+                response.data.forEach(task => {
+                    if (task.done) {
+                        this.tasksDone.push(task);
+                    } else {
+                        this.tasksNotDone.push(task);
+                    }
+                });
 
                 // FERMO IL LOADING
                 this.store.loading = false;
@@ -58,9 +69,6 @@ export default {
             // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
             axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then((response) => {
 
-                // STAMPO IL RISULTATO IN CONSOLE
-                console.log(response);
-
                 // AGGIORNO LE TASKS
                 this.getTasks();
 
@@ -77,35 +85,68 @@ export default {
 </script>
 
 <template>
-    <div class="container bg-white border rounded-5 shadow my-5" v-if="!this.store.loading">
-        <div class="row py-5">
-            <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Done</th>
-                            <th scope="col">Titolo</th>
-                            <th scope="col">Data</th>
-                            <th scope="col">Ora</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr role="button" v-for="task in tasks" :key="task.id" @click="taskEdit(task)">
-                            <td>
-                                <input type="checkbox" role="button" class="form-check-input" :name="task.title"
-                                    :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
-                            </td>
-                            <td v-text="task.title"></td>
-                            <td v-text="`${task.date ? task.date : 'null'}`"></td>
-                            <td v-text="`${task.time ? task.time : 'null'}`"></td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="container-fluid" v-if="!this.store.loading">
+        <div class="container bg-white border rounded-5 shadow my-5">
+            <div class="row py-5">
+                <div class="col-12">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Done</th>
+                                <th scope="col">Titolo</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Ora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr role="button" v-for="task in tasksNotDone" :key="task.id" @click="taskEdit(task)">
+                                <td>
+                                    <input type="checkbox" role="button" class="form-check-input" :name="task.title"
+                                        :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
+                                </td>
+                                <td v-text="task.title"></td>
+                                <td v-text="`${task.date ? task.date : 'null'}`"></td>
+                                <td v-text="`${task.time ? task.time : 'null'}`"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="col-12">
-                <ol>
-                    <li v-for="taskCategory in tasksCategories">{{ taskCategory.title }}</li>
-                </ol>
+        </div>
+        <div class="container bg-white border rounded-5 shadow my-5">
+            <div class="row py-5">
+                <div class="col-12">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Done</th>
+                                <th scope="col">Titolo</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Ora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr role="button" v-for="task in tasksDone" :key="task.id" @click="taskEdit(task)">
+                                <td>
+                                    <input type="checkbox" role="button" class="form-check-input" :name="task.title"
+                                        :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
+                                </td>
+                                <td v-text="task.title"></td>
+                                <td v-text="`${task.date ? task.date : 'null'}`"></td>
+                                <td v-text="`${task.time ? task.time : 'null'}`"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="container bg-white border rounded-5 shadow my-5">
+            <div class="row py-5">
+                <div class="col-12">
+                    <ol>
+                        <li v-for="taskCategory in tasksCategories">{{ taskCategory.title }}</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
