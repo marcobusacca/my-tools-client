@@ -3,12 +3,22 @@ import { store } from '../store';
 import axios from 'axios';
 
 export default {
+    inject: ['theme'],
     data() {
         return {
             store,
             tasksNotDone: [],
             tasksDone: [],
             tasksCategories: [],
+            taskActive: {},
+            taskActiveTitle: null,
+            newTask: {
+                title: "",
+                date: "",
+                time: "",
+                done: false,
+                taskCategory: {},
+            },
         }
     },
     mounted() {
@@ -69,6 +79,9 @@ export default {
             // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
             axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then((response) => {
 
+                // STAMPO IN CONSOLE IL RISULTATO
+                console.log(response);
+
                 // AGGIORNO LE TASKS
                 this.getTasks();
 
@@ -77,37 +90,84 @@ export default {
                 console.error("Errore nella Chiamata API setTaskDone: ", error);
             });
         },
-        taskEdit(task) {
-            console.log(task.id);
-        }
+        taskEditModal(task) {
+            this.taskActive = task;
+            this.taskActiveTitle = task.title;
+        },
+        taskUpdate() {
+            // FACCIO PARTIRE IL LOADING
+            this.store.loading = true;
+
+            // EFFETTUO LA CHIAMATA PUT PER OTTENERE AGGIORNARE LA TASK
+            axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.taskActive).then((response) => {
+
+                // STAMPO IN CONSOLE IL RISULTATO
+                console.log(response);
+
+                // AVVIO "RESET_TASK_ACTIVE"
+                this.resetTaskActive();
+
+            }).catch((error) => {
+                // STAMPO IN CONSOLE L'ERRORE
+                console.error("Errore nella Chiamata API getTasks: ", error);
+            });
+        },
+        resetTaskActive() {
+            this.taskActive = {};
+            this.taskActiveTitle = null;
+            this.getTasks();
+        },
     },
 }
 </script>
 
 <template>
     <div class="container-fluid" v-if="!this.store.loading">
+        <!-- CONTAINER TASK NOT DONE -->
         <div class="container border rounded-5 shadow my-5">
             <div class="row py-5">
-                <div class="col-12">
-                    <table class="table table-hover">
+                <!-- TABLE TITLE -->
+                <div class="col-12 text-center">
+                    <h3>Task da completare</h3>
+                </div>
+                <!-- TABLE TASK -->
+                <div class="col-12 mt-5">
+                    <table class="table table-hover text-center">
+                        <!-- TABLE HEADER -->
                         <thead>
                             <tr>
                                 <th scope="col">Done</th>
                                 <th scope="col">Titolo</th>
                                 <th scope="col">Data</th>
                                 <th scope="col">Ora</th>
+                                <th scope="col">Strumenti</th>
                             </tr>
                         </thead>
+                        <!-- TABLE BODY -->
                         <tbody>
-                            <tr role="button" v-for="task in tasksNotDone" :key="task.id" @click="taskEdit(task)">
+                            <!-- TASK ROW -->
+                            <tr role="button" v-for="task in tasksNotDone" :key="task.id">
+                                <!-- TASK CHECKBOX -->
                                 <td>
                                     <input type="checkbox" role="button" class="form-check-input" :name="task.title"
                                         :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
                                 </td>
+                                <!-- TASK TITLE -->
                                 <td v-text="task.title"></td>
-                                <td v-text="`${task.date ? task.date : 'null'}`"></td>
-                                <td v-text="`${task.time ? task.time : 'null'}`"></td>
+                                <!-- TASK DATE -->
+                                <td v-text="`${task.date ? task.date : '-'}`"></td>
+                                <!-- TASK TIME -->
+                                <td v-text="`${task.time ? task.time : '-'}`"></td>
+                                <!-- TASK TOOLS -->
+                                <td>
+                                    <!-- BUTTON EDIT -->
+                                    <button class="btn btn-warning mx-1" data-bs-toggle="modal"
+                                        data-bs-target="#taskToolsModal" @click="taskEditModal(task)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
                             </tr>
+                            <!-- TASK EMPTY MESSAGE -->
                             <tr v-if="!tasksNotDone.length">
                                 <td colspan="4" class="text-center py-4">Nessuna task da completare</td>
                             </tr>
@@ -116,45 +176,71 @@ export default {
                 </div>
             </div>
         </div>
+        <!-- CONTAINER TASK DONE -->
+        <!-- CONTAINER TASKS CATEGORIES -->
         <div class="container border rounded-5 shadow my-5">
             <div class="row py-5">
                 <div class="col-12">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Done</th>
-                                <th scope="col">Titolo</th>
-                                <th scope="col">Data</th>
-                                <th scope="col">Ora</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr role="button" v-for="task in tasksDone" :key="task.id" @click="taskEdit(task)">
-                                <td>
-                                    <input type="checkbox" role="button" class="form-check-input" :name="task.title"
-                                        :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
-                                </td>
-                                <td v-text="task.title"></td>
-                                <td v-text="`${task.date ? task.date : 'null'}`"></td>
-                                <td v-text="`${task.time ? task.time : 'null'}`"></td>
-                            </tr>
-                            <tr v-if="!tasksDone.length">
-                                <td colspan="4" class="text-center py-4">Nessuna task completata</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="container border rounded-5 shadow my-5">
-            <div class="row py-5">
-                <div class="col-12">
-                    <ol>
+                    <ol class="m-0">
                         <li v-for="taskCategory in tasksCategories">{{ taskCategory.title }}</li>
                     </ol>
                 </div>
             </div>
         </div>
+        <!-- TASK TOOLS MODAL -->
+        <div class="modal modal-xl fade my-lg-5" id="taskToolsModal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="taskToolsModalLabel" aria-hidden="true">
+            <!-- MODAL DIALOG -->
+            <div class="modal-dialog">
+                <!-- MODAL CONTENT -->
+                <div class="modal-content" :class="theme + '-mode-task-form-modal'">
+                    <!-- MODAL HEADER -->
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="taskToolsModalLabel" v-text="this.taskActiveTitle"></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            @click="resetTaskActive"></button>
+                    </div>
+                    <!-- MODAL BODY -->
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="task-title">Titolo</label>
+                            <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
+                                v-model="this.taskActive.title">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="task-date">Data</label>
+                            <input type="date" class="form-control" id="task-date" v-model="this.taskActive.date">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="task-time">Ora</label>
+                            <input type="time" class="form-control" id="task-time" v-model="this.taskActive.time">
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="task-done">Task completata</label>
+                            <select class="form-select" id="task-done" v-model="this.taskActive.done">
+                                <option :value="true">Si</option>
+                                <option :value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="task-category">Categoria</label>
+                            <select class="form-select" id="task-category" v-model="this.taskActive.taskCategory">
+                                <option v-for="taskCategory in tasksCategories" :key="taskCategory.id" :value="taskCategory"
+                                    v-text="taskCategory.title"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- MODAL FOOTER -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="resetTaskActive">Annulla</button>
+                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal"
+                            @click="taskUpdate">Modifica</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CONFIRM DELETE TASK MODAL -->
     </div>
 </template>
 
