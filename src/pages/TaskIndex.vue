@@ -7,11 +7,18 @@ export default {
     data() {
         return {
             store,
+
             tasksNotDone: [],
             tasksDone: [],
+
+            newTasksNotDone: [],
+            newTasksDone: [],
+
             tasksCategories: [],
+
             taskActive: {},
             taskActiveTitle: null,
+
             newTask: {
                 title: "",
                 date: "",
@@ -45,6 +52,9 @@ export default {
                         this.tasksNotDone.push(task);
                     }
                 });
+
+                this.createNewTasksNotDone();
+                this.createNewTasksDone();
 
                 // FERMO IL LOADING
                 this.store.loading = false;
@@ -117,6 +127,37 @@ export default {
             this.taskActiveTitle = null;
             this.getTasks();
         },
+        createNewTasksNotDone() {
+            // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
+            this.newTasksNotDone = this.tasksNotDone.map(task => ({
+                // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
+                ...task,
+                // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
+                formattedDate: this.formatItalianDate(task.date),
+                // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
+                formattedTime: this.formatItalianTime(task.time),
+            }))
+        },
+        createNewTasksDone() {
+            this.newTasksDone = this.tasksDone.map(task => ({
+                // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
+                ...task,
+                // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
+                formattedDate: this.formatItalianDate(task.date),
+                // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
+                formattedTime: this.formatItalianTime(task.time),
+            }))
+        },
+        formatItalianDate(originalDate) {
+            const options = { day: "numeric", month: "numeric", year: "numeric" };
+            const date = new Date(originalDate);
+            return date.toLocaleDateString("it-IT", options);
+        },
+        formatItalianTime(originalTime) {
+            const options = { hour: "numeric", minute: "numeric" };
+            const time = new Date(`1970-01-01T${originalTime}`);
+            return time.toLocaleTimeString("it-IT", options);
+        },
     },
 }
 </script>
@@ -146,7 +187,7 @@ export default {
                         <!-- TABLE BODY -->
                         <tbody>
                             <!-- TASK ROW -->
-                            <tr role="button" v-for="task in tasksNotDone" :key="task.id">
+                            <tr role="button" v-for="task in newTasksNotDone" :key="task.id">
                                 <!-- TASK CHECKBOX -->
                                 <td>
                                     <input type="checkbox" role="button" class="form-check-input" :name="task.title"
@@ -155,9 +196,9 @@ export default {
                                 <!-- TASK TITLE -->
                                 <td v-text="task.title"></td>
                                 <!-- TASK DATE -->
-                                <td v-text="`${task.date ? task.date : '-'}`"></td>
+                                <td v-text="`${task.date ? task.formattedDate : '-'}`"></td>
                                 <!-- TASK TIME -->
-                                <td v-text="`${task.time ? task.time : '-'}`"></td>
+                                <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
                                 <!-- TASK TOOLS -->
                                 <td>
                                     <!-- BUTTON EDIT -->
@@ -169,7 +210,7 @@ export default {
                             </tr>
                             <!-- TASK EMPTY MESSAGE -->
                             <tr v-if="!tasksNotDone.length">
-                                <td colspan="4" class="text-center py-4">Nessuna task da completare</td>
+                                <td colspan="5" class="text-center py-4">Nessuna task da completare</td>
                             </tr>
                         </tbody>
                     </table>
