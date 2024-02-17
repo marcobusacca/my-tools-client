@@ -51,12 +51,12 @@ export default {
                 console.error("Errore nella Chiamata API getTasksCategories: ", error);
             });
         },
-        setTaskDone(task) {
+        setTaskDone(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
-            // EFFETTUO LA CHIAMATA POST PER AGGIORNARE LO STATO "DONE" DELLO TASK
-            axios.post(`${this.store.baseUrl}/api/tasks/done/${task.id}`).then((response) => {
+            // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
+            axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then((response) => {
 
                 // STAMPO IL RISULTATO IN CONSOLE
                 console.log(response);
@@ -93,7 +93,7 @@ export default {
                         <tr role="button" v-for="task in tasks" :key="task.id" @click="taskEdit(task)">
                             <td>
                                 <input type="checkbox" role="button" class="form-check-input" :name="task.title"
-                                    :id="task.id" :checked="task.done" @click="setTaskDone(task)">
+                                    :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
                             </td>
                             <td v-text="task.title"></td>
                             <td v-text="`${task.date ? task.date : 'null'}`"></td>
