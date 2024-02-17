@@ -9,9 +9,10 @@ export default {
         <div class="container-fluid bg-black text-white text-center py-3">
             <div class="row">
                 <div class="col-12">
-                    <router-link class="text-white text-decoration-none" :to="{ name: 'home-page' }">
-                        <h1>MY-TOOLS</h1>
-                    </router-link>
+                    <h1>
+                        <router-link class="text-white text-decoration-none"
+                            :to="{ name: 'home-page' }">MY-TOOLS</router-link>
+                    </h1>
                 </div>
             </div>
         </div>
