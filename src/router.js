@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // IMPORTARE TUTTE LE PAGINE DALLA CARTELLA "PAGES"
+import HomePage from './pages/HomePage.vue';
 import TaskIndex from './pages/TaskIndex.vue';
 
 
@@ -10,6 +11,11 @@ const router = createRouter({
     history: createWebHistory(),
 
     routes: [
+        {
+            path: '/',
+            name: 'home-page',
+            component: HomePage,
+        },
         {
             path: '/tasks',
             name: 'tasks',
