@@ -30,4 +30,6 @@ export default {
 <style lang="scss">
 // IMPORTO GENERALS.SCSS
 @use './styles/generals.scss' as *;
+// IMPORTO VARIABLES.SCSS
+@use './styles/partials/variables' as *;
 </style>
