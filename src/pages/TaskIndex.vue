@@ -86,7 +86,7 @@ export default {
 
 <template>
     <div class="container-fluid" v-if="!this.store.loading">
-        <div class="container bg-white border rounded-5 shadow my-5">
+        <div class="container border rounded-5 shadow my-5">
             <div class="row py-5">
                 <div class="col-12">
                     <table class="table table-hover">
@@ -108,12 +108,15 @@ export default {
                                 <td v-text="`${task.date ? task.date : 'null'}`"></td>
                                 <td v-text="`${task.time ? task.time : 'null'}`"></td>
                             </tr>
+                            <tr v-if="!tasksNotDone.length">
+                                <td colspan="4" class="text-center py-4">Nessuna task da completare</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="container bg-white border rounded-5 shadow my-5">
+        <div class="container border rounded-5 shadow my-5">
             <div class="row py-5">
                 <div class="col-12">
                     <table class="table table-hover">
@@ -135,12 +138,15 @@ export default {
                                 <td v-text="`${task.date ? task.date : 'null'}`"></td>
                                 <td v-text="`${task.time ? task.time : 'null'}`"></td>
                             </tr>
+                            <tr v-if="!tasksDone.length">
+                                <td colspan="4" class="text-center py-4">Nessuna task completata</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="container bg-white border rounded-5 shadow my-5">
+        <div class="container border rounded-5 shadow my-5">
             <div class="row py-5">
                 <div class="col-12">
                     <ol>

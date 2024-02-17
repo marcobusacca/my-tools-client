@@ -6,3 +6,49 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+/************************************************/
+
+body.light-mode {
+    background-color: #fff;
+    color: #333;
+
+    th,
+    td {
+        background-color: #fff;
+        color: #333;
+    }
+}
+
+header.light-mode {
+    background-color: #fff;
+    color: #333;
+
+    .router-link {
+        color: #333;
+    }
+}
+
+/************************************************/
+
+body.dark-mode {
+    background-color: #333;
+    color: #fff;
+
+    th,
+    td {
+        background-color: #333;
+        color: #fff;
+    }
+}
+
+header.dark-mode {
+    background-color: #333;
+    color: #fff;
+
+    .router-link {
+        color: #fff;
+    }
+}
+
+/************************************************/

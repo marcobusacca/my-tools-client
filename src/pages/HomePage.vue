@@ -11,7 +11,7 @@ export default {
 </script>
 
 <template>
-    <div class="container bg-white border rounded-5 shadow my-5" v-if="!this.store.loading">
+    <div class="container border rounded-5 shadow my-5" v-if="!this.store.loading">
         <div class="row justify-content-center py-5">
             <div class="col-12 text-center my-3">
                 <!-- <router-link :to="{ name: 'tasks', params: { slug: task.slug } }"></router-link> -->
