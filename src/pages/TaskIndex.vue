@@ -59,7 +59,7 @@ export default {
 </script>
 
 <template>
-    <div class="container bg-white border rounded-5 shadow my-5">
+    <div class="container bg-white border rounded-5 shadow my-5" v-if="!this.store.loading">
         <div class="row py-5">
             <div class="col-12">
                 <ol>
