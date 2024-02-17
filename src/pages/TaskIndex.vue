@@ -26,6 +26,8 @@ export default {
                 done: false,
                 taskCategory: {},
             },
+
+            formErrors: {},
         }
     },
     mounted() {
@@ -104,9 +106,29 @@ export default {
             this.taskActive = task;
             this.taskActiveTitle = task.title;
         },
+        cancelTaskEditModal() {
+            this.taskActive = {};
+            this.taskActiveTitle = null;
+            this.formErrors = {};
+            this.getTasks();
+        },
         taskUpdate() {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
+
+            // SVUOTO IL FORM_ERRORS
+            this.formErrors = {};
+
+            // EFFETTUO LE VALIDAZIONI
+            if (this.taskActive.title.trim() === "") {
+                this.formErrors.title = "Il titolo della task è obbligatorio";
+            }
+
+            // SE CI SONO ERRORI, FERMO IL METODO
+            if (Object.keys(this.formErrors).length > 0) {
+                this.store.loading = false;
+                return;
+            }
 
             // EFFETTUO LA CHIAMATA PUT PER OTTENERE AGGIORNARE LA TASK
             axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.taskActive).then((response) => {
@@ -114,18 +136,32 @@ export default {
                 // STAMPO IN CONSOLE IL RISULTATO
                 console.log(response);
 
-                // AVVIO "RESET_TASK_ACTIVE"
-                this.resetTaskActive();
+                // CHIUDO LA MODALE "TASK_EDIT_MODAL"
+                this.closeTaskEditModal();
+
+                // AVVIO "CANCEL_TASK_EDIT_MODAL"
+                this.cancelTaskEditModal();
 
             }).catch((error) => {
                 // STAMPO IN CONSOLE L'ERRORE
                 console.error("Errore nella Chiamata API getTasks: ", error);
             });
         },
-        resetTaskActive() {
-            this.taskActive = {};
-            this.taskActiveTitle = null;
-            this.getTasks();
+        closeTaskEditModal() {
+            // RIPRISTINO GLI STILI DEL BODY
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '';
+
+            // RIMUOVO DAL BODY LA CLASSE "MODAL-OPEN"
+            document.body.classList.remove('modal-open');
+
+            // TROVO IL MODAL_BACKDROP
+            const modalBackdropElement = document.querySelector('.modal-backdrop');
+
+            // SE ESISTE, LO RIMUOVO
+            if (modalBackdropElement) {
+                modalBackdropElement.remove();
+            }
         },
         createNewTasksNotDone() {
             // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
@@ -203,7 +239,7 @@ export default {
                                 <td>
                                     <!-- BUTTON EDIT -->
                                     <button class="btn btn-warning mx-1" data-bs-toggle="modal"
-                                        data-bs-target="#taskToolsModal" @click="taskEditModal(task)">
+                                        data-bs-target="#taskEditModal" @click="taskEditModal(task)">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                 </td>
@@ -229,42 +265,55 @@ export default {
             </div>
         </div>
         <!-- TASK TOOLS MODAL -->
-        <div class="modal modal-xl fade my-lg-5" id="taskToolsModal" data-bs-backdrop="static" data-bs-keyboard="false"
-            tabindex="-1" aria-labelledby="taskToolsModalLabel" aria-hidden="true">
+        <div class="modal modal-xl fade my-lg-5" id="taskEditModal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="taskEditModalLabel" aria-hidden="true">
             <!-- MODAL DIALOG -->
             <div class="modal-dialog">
                 <!-- MODAL CONTENT -->
                 <div class="modal-content" :class="theme + '-mode-task-form-modal'">
                     <!-- MODAL HEADER -->
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="taskToolsModalLabel" v-text="this.taskActiveTitle"></h1>
+                        <!-- MODAL TITLE -->
+                        <h1 class="modal-title fs-5" id="taskEditModalLabel" v-text="this.taskActiveTitle"></h1>
+                        <!-- BUTTON CLOSE -->
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            @click="resetTaskActive"></button>
+                            @click="cancelTaskEditModal"></button>
                     </div>
                     <!-- MODAL BODY -->
                     <div class="modal-body">
+                        <!-- CONTAINER MESSAGGI DI ERRORI -->
+                        <div class="alert alert-danger" v-if="Object.keys(formErrors).length > 0">
+                            <ul>
+                                <li v-for="(error, key) in formErrors" :key="key" v-text="error"></li>
+                            </ul>
+                        </div>
+                        <!-- INPUT TITOLO -->
                         <div class="input-group mb-3">
-                            <label class="input-group-text" for="task-title">Titolo</label>
+                            <label class="input-group-text" for="task-title">Titolo*</label>
                             <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
                                 v-model="this.taskActive.title">
                         </div>
+                        <!-- INPUT DATA -->
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-date">Data</label>
                             <input type="date" class="form-control" id="task-date" v-model="this.taskActive.date">
                         </div>
+                        <!-- INPUT ORA -->
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-time">Ora</label>
                             <input type="time" class="form-control" id="task-time" v-model="this.taskActive.time">
                         </div>
+                        <!-- SELECT DONE -->
                         <div class="input-group mb-3">
-                            <label class="input-group-text" for="task-done">Task completata</label>
+                            <label class="input-group-text" for="task-done">Task completata*</label>
                             <select class="form-select" id="task-done" v-model="this.taskActive.done">
                                 <option :value="true">Si</option>
                                 <option :value="false">No</option>
                             </select>
                         </div>
+                        <!-- SELECT CATEGORIA -->
                         <div class="input-group mb-3">
-                            <label class="input-group-text" for="task-category">Categoria</label>
+                            <label class="input-group-text" for="task-category">Categoria*</label>
                             <select class="form-select" id="task-category" v-model="this.taskActive.taskCategory">
                                 <option v-for="taskCategory in tasksCategories" :key="taskCategory.id" :value="taskCategory"
                                     v-text="taskCategory.title"></option>
@@ -273,10 +322,11 @@ export default {
                     </div>
                     <!-- MODAL FOOTER -->
                     <div class="modal-footer">
+                        <!-- BUTTON ANNULLA -->
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="resetTaskActive">Annulla</button>
-                        <button type="button" class="btn btn-warning" data-bs-dismiss="modal"
-                            @click="taskUpdate">Modifica</button>
+                            @click="cancelTaskEditModal">Annulla</button>
+                        <!-- BUTTON MODIFICA -->
+                        <button type="button" class="btn btn-warning" @click="taskUpdate">Modifica</button>
                     </div>
                 </div>
             </div>
