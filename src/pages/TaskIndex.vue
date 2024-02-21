@@ -11,9 +11,6 @@ export default {
             tasksNotDone: [],
             tasksDone: [],
 
-            newTasksNotDone: [],
-            newTasksDone: [],
-
             tasksCategories: [],
 
             taskActive: {},
@@ -44,17 +41,38 @@ export default {
             // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DI TASKS
             axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
 
+                // DICHIARO GLI ARRAY PER SUDDIVIDERE LE TASK
+                let rawTasksNotDone = [];
+                let rawTasksDone = [];
+
                 // INSERISCO LE TASKS NEI RISPETTIVI ARRAY
                 response.data.forEach(task => {
-                    if (task.done) {
-                        this.tasksDone.push(task);
+                    if (!task.done) {
+                        rawTasksNotDone.push(task);
                     } else {
-                        this.tasksNotDone.push(task);
+                        rawTasksDone.push(task);
                     }
                 });
 
-                this.createNewTasksNotDone();
-                this.createNewTasksDone();
+                // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
+                this.tasksNotDone = rawTasksNotDone.map(task => ({
+                    // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
+                    ...task,
+                    // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
+                    formattedDate: this.formatItalianDate(task.date),
+                    // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
+                    formattedTime: this.formatItalianTime(task.time),
+                }));
+
+                // MAPPO L'ARRAY DELLE "TASKS_DONE"
+                this.TasksDone = rawTasksDone.map(task => ({
+                    // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
+                    ...task,
+                    // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
+                    formattedDate: this.formatItalianDate(task.date),
+                    // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
+                    formattedTime: this.formatItalianTime(task.time),
+                }));
 
                 // FERMO IL LOADING
                 this.store.loading = false;
@@ -215,27 +233,6 @@ export default {
         /*
             FINE GESTIONE TASK FORM
         */
-        createNewTasksNotDone() {
-            // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
-            this.newTasksNotDone = this.tasksNotDone.map(task => ({
-                // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
-                ...task,
-                // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
-                formattedDate: this.formatItalianDate(task.date),
-                // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
-                formattedTime: this.formatItalianTime(task.time),
-            }))
-        },
-        createNewTasksDone() {
-            this.newTasksDone = this.tasksDone.map(task => ({
-                // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
-                ...task,
-                // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
-                formattedDate: this.formatItalianDate(task.date),
-                // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
-                formattedTime: this.formatItalianTime(task.time),
-            }))
-        },
         formatItalianDate(originalDate) {
             const options = { day: "numeric", month: "numeric", year: "numeric" };
             const date = new Date(originalDate);
@@ -287,7 +284,7 @@ export default {
                         <!-- TABLE BODY -->
                         <tbody>
                             <!-- TASK ROW -->
-                            <tr role="button" v-for="task in newTasksNotDone" :key="task.id">
+                            <tr role="button" v-for="task in tasksNotDone" :key="task.id">
                                 <!-- TASK CHECKBOX -->
                                 <td>
                                     <input type="checkbox" role="button" class="form-check-input" :name="task.title"
