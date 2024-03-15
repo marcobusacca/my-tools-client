@@ -236,6 +236,12 @@ export default {
         /*
             INIZIO GESTIONE TASK DELETE
         */
+        confirmDeleteTaskModal(task){
+            this.taskActive = task;
+        },
+        cancelConfirmDeleteTaskModal(){
+            this.taskActive = {};
+        },
         deleteTask(id){
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
@@ -244,6 +250,8 @@ export default {
             axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then((response) => {
 
                 console.log(response);
+
+                this.cancelConfirmDeleteTaskModal();
 
                 this.getTasks();
 
@@ -326,7 +334,7 @@ export default {
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <!-- BUTTON DELETE -->
-                                    <button class="btn btn-danger mx-1" @click="deleteTask(task.id)">
+                                    <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -346,7 +354,7 @@ export default {
             <!-- MODAL DIALOG -->
             <div class="modal-dialog">
                 <!-- MODAL CONTENT -->
-                <div class="modal-content" :class="theme + '-mode-task-form-modal'">
+                <div class="modal-content" :class="theme + '-mode-task-modals'">
                     <!-- MODAL HEADER -->
                     <div class="modal-header">
                         <!-- MODAL TITLE -->
@@ -367,17 +375,17 @@ export default {
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-title">Titolo*</label>
                             <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
-                                v-model="this.newTask.title">
+                                v-model="this.newTask.title" @keyup.enter="taskSubmitForm">
                         </div>
                         <!-- INPUT DATA -->
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-date">Data</label>
-                            <input type="date" class="form-control" id="task-date" v-model="this.newTask.date">
+                            <input type="date" class="form-control" id="task-date" v-model="this.newTask.date" @keyup.enter="taskSubmitForm">
                         </div>
                         <!-- INPUT ORA -->
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-time">Ora</label>
-                            <input type="time" class="form-control" id="task-time" v-model="this.newTask.time">
+                            <input type="time" class="form-control" id="task-time" v-model="this.newTask.time" @keyup.enter="taskSubmitForm">
                         </div>
                         <!-- SELECT DONE -->
                         <div class="input-group mb-3">
@@ -412,6 +420,32 @@ export default {
             </div>
         </div>
         <!-- CONFIRM DELETE TASK MODAL -->
+        <div class="modal fade" id="confirmDeleteTaskModal" tabindex="-1" aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
+            <!-- MODAL DIALOG -->
+            <div class="modal-dialog">
+                <!-- MODAL CONTENT -->
+                <div class="modal-content" :class="theme + '-mode-task-modals'">
+                    <!-- MODAL HEADER -->
+                    <div class="modal-header">
+                        <!-- MODAL TITLE -->
+                        <h1 class="modal-title fs-5" id="confirmDeleteTaskModalLabel">Conferma eliminazione task</h1>
+                        <!-- BUTTON CLOSE -->
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="cancelConfirmDeleteTaskModal()"></button>
+                    </div>
+                    <!-- MODAL BODY -->
+                    <div class="modal-body">
+                        Sei sicuro di voler eliminare: "{{ taskActive.title }}"?
+                    </div>
+                    <!-- MODAL FOOTER -->
+                    <div class="modal-footer">
+                        <!-- BUTTON ANNULLA -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelConfirmDeleteTaskModal()">Annulla</button>
+                        <!-- SUBMIT BUTTON: DELETE TASK -->
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTask(taskActive.id)">Elimina</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
