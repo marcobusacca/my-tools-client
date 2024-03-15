@@ -233,6 +233,28 @@ export default {
         /*
             FINE GESTIONE TASK FORM
         */
+        /*
+            INIZIO GESTIONE TASK DELETE
+        */
+        deleteTask(id){
+            // FACCIO PARTIRE IL LOADING
+            this.store.loading = true;
+
+            // EFFETTUO LA CHIAMATA DELETE PER CANCELLARE LA TASK
+            axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then((response) => {
+
+                console.log(response);
+
+                this.getTasks();
+
+            }).catch((error) => {
+                // STAMPO IN CONSOLE L'ERRORE
+                console.error("Errore nella Chiamata API deleteTask: ", error);
+            });
+        },
+        /*
+            FINE GESTIONE TASK DELETE
+        */
         formatItalianDate(originalDate) {
             const options = { day: "numeric", month: "numeric", year: "numeric" };
             const date = new Date(originalDate);
@@ -274,7 +296,7 @@ export default {
                         <!-- TABLE HEADER -->
                         <thead>
                             <tr>
-                                <th scope="col">Done</th>
+                                <th scope="col">Completata</th>
                                 <th scope="col">Titolo</th>
                                 <th scope="col">Data</th>
                                 <th scope="col">Ora</th>
@@ -283,7 +305,7 @@ export default {
                         </thead>
                         <!-- TABLE BODY -->
                         <tbody>
-                            <!-- TASK ROW -->
+                            <!-- TASKS ROWS -->
                             <tr role="button" v-for="task in tasksNotDone" :key="task.id">
                                 <!-- TASK CHECKBOX -->
                                 <td>
@@ -302,6 +324,10 @@ export default {
                                     <button class="btn btn-warning mx-1" data-bs-toggle="modal"
                                         data-bs-target="#taskFormModal" @click="taskFormModal(task)">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <!-- BUTTON DELETE -->
+                                    <button class="btn btn-danger mx-1" @click="deleteTask(task.id)">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -357,8 +383,8 @@ export default {
                         <div class="input-group mb-3">
                             <label class="input-group-text" for="task-done">Task completata*</label>
                             <select class="form-select" id="task-done" v-model="this.newTask.done">
-                                <option :value="true">Si</option>
                                 <option :value="false">No</option>
+                                <option :value="true">Si</option>
                             </select>
                         </div>
                         <!-- SELECT CATEGORIA -->

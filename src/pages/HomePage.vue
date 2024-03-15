@@ -16,7 +16,7 @@ export default {
             <div class="col-12 d-flex align-items-center">
                 <!-- <router-link :to="{ name: 'tasks', params: { slug: task.slug } }"></router-link> -->
                 <router-link class="btn btn-primary" :to="{ name: 'tasks' }">Tasks</router-link>
-                <span class="ms-3">Gestisci le tue Task Quotidiane attraverso la ToDo-List</span>
+                <span class="ms-3">Gestisci le tue Task Quotidiane attraverso la To-Do List</span>
             </div>
         </div>
     </div>

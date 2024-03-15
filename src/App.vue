@@ -5,6 +5,8 @@ import AppHeader from './components/AppHeader.vue';
 import AppLoader from './components/AppLoader.vue';
 
 export default {
+  inject: ['theme'],
+
   components: {
     AppHeader,
     AppLoader,
@@ -13,6 +15,14 @@ export default {
     return {
       store,
     }
+  },
+  mounted() {
+    this.setThemeMode();
+  },
+  methods: {
+    setThemeMode(){
+      document.body.classList.add(this.theme === 'light' ? 'light-mode' : 'dark-mode');
+    },
   },
 }
 </script>
