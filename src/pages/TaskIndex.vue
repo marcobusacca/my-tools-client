@@ -65,7 +65,7 @@ export default {
                 }));
 
                 // MAPPO L'ARRAY DELLE "TASKS_DONE"
-                this.TasksDone = rawTasksDone.map(task => ({
+                this.tasksDone = rawTasksDone.map(task => ({
                     // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
                     ...task,
                     // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
@@ -287,7 +287,7 @@ export default {
                     <div class="row">
                         <!-- TITLE -->
                         <div class="col-6 px-5">
-                            <h3>Task da completare</h3>
+                            <h3>Da completare</h3>
                         </div>
                         <!-- CREATE TASK BUTTON -->
                         <div class="col-6 text-end px-5">
@@ -342,6 +342,64 @@ export default {
                             <!-- TASK EMPTY MESSAGE -->
                             <tr v-if="!tasksNotDone.length">
                                 <td colspan="5" class="text-center py-4">Nessuna task da completare</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- CONTAINER TASK DONE -->
+        <div class="container border rounded-5 shadow my-5">
+            <div class="row py-5">
+                <!-- HEADER -->
+                <div class="col-12 px-5">
+                    <!-- TITLE -->
+                    <h3>Completate</h3>
+                </div>
+                <!-- TABLE TASK -->
+                <div class="col-12 mt-5">
+                    <table class="table table-hover text-center">
+                        <!-- TABLE HEADER -->
+                        <thead>
+                            <tr>
+                                <th scope="col">Completata</th>
+                                <th scope="col">Titolo</th>
+                                <th scope="col">Data</th>
+                                <th scope="col">Ora</th>
+                                <th scope="col">Strumenti</th>
+                            </tr>
+                        </thead>
+                        <!-- TABLE BODY -->
+                        <tbody>
+                            <!-- TASKS ROWS -->
+                            <tr role="button" v-for="task in tasksDone" :key="task.id">
+                                <!-- TASK CHECKBOX -->
+                                <td>
+                                    <input type="checkbox" role="button" class="form-check-input" :name="task.title"
+                                        :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
+                                </td>
+                                <!-- TASK TITLE -->
+                                <td v-text="task.title"></td>
+                                <!-- TASK DATE -->
+                                <td v-text="`${task.date ? task.formattedDate : '-'}`"></td>
+                                <!-- TASK TIME -->
+                                <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
+                                <!-- TASK TOOLS -->
+                                <td>
+                                    <!-- BUTTON EDIT -->
+                                    <button class="btn btn-warning mx-1" data-bs-toggle="modal"
+                                        data-bs-target="#taskFormModal" @click="taskFormModal(task)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <!-- BUTTON DELETE -->
+                                    <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- TASK EMPTY MESSAGE -->
+                            <tr v-if="!tasksDone.length">
+                                <td colspan="5" class="text-center py-4">Nessuna task completata</td>
                             </tr>
                         </tbody>
                     </table>
