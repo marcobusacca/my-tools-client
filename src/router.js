@@ -17,8 +17,8 @@ const router = createRouter({
             component: HomePage,
         },
         {
-            path: '/tasks',
-            name: 'tasks',
+            path: '/todo-list',
+            name: 'todo-list',
             component: TaskIndex,
         },
         // {

@@ -10,7 +10,57 @@
     box-sizing: border-box;
 }
 
-/************************************************/
+/*** LAYOUT *************************************/
+
+header {
+    height: 70px;
+    position: fixed;
+    left: 0;
+    right: 0;
+}
+
+main {
+    padding-top: 70px;
+}
+
+.router-link {
+    text-decoration: none;
+}
+
+.active-router-link {
+    background-color: rgba(0, 0, 0, 0.158);
+}
+
+@media screen and (min-width: 992px) {
+    header {
+        height: 90px;
+    }
+
+    main {
+        padding-top: 90px;
+        height: 100vh;
+        display: flex;
+    }
+
+    .desktop-main-sidebar {
+        width: 300px;
+
+        .router-link {
+            font-weight: bold;
+
+            span {
+                font-size: 18px;
+            }
+        }
+    }
+
+    .main-content {
+        width: calc(100vw - 300px);
+        overflow-y: auto;
+    }
+}
+
+/*** LIGHT-MODE *************************************/
 
 body.light-mode {
     background-color: $BgColorLightMode;
@@ -32,7 +82,19 @@ header.light-mode {
     }
 }
 
-/************************************************/
+.main-sidebar {
+
+    .light-router-row {
+        border-top: 3px solid rgb(235, 235, 235);
+
+        .light-router-link {
+            border-bottom: 3px solid rgb(235, 235, 235);
+            color: $TextColorLightMode;
+        }
+    }
+}
+
+/*** DARK-MODE *************************************/
 
 body.dark-mode {
     background-color: $BgColorDarkMode;
@@ -56,6 +118,23 @@ header.dark-mode {
 
     .router-link {
         color: $TextColorDarkMode;
+    }
+
+    .dark-mobile-sidebar {
+        background-color: $BgColorDarkMode;
+        color: $TextColorDarkMode;
+    }
+}
+
+.main-sidebar {
+
+    .dark-router-row {
+        border-top: 3px solid rgb(63, 63, 63);
+
+        .dark-router-link {
+            border-bottom: 3px solid rgb(63, 63, 63);
+            color: $TextColorDarkMode;
+        }
     }
 }
 
