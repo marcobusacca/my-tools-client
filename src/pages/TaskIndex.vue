@@ -479,7 +479,8 @@ export default {
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK MODAL -->
-            <div class="modal fade" id="confirmDeleteTaskModal" tabindex="-1" aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
+            <div class="modal fade" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
