@@ -1,48 +1,48 @@
 <script>
 import { store } from '../store';
+import axios from 'axios';
 
 export default {
     data() {
         return {
             store,
+
+            taskNotDoneCounter: 0,
         }
+    },
+    mounted() {
+        this.getTasksNotDoneCounter();
+    },
+    methods: {
+        getTasksNotDoneCounter(){
+
+            this.store.loading = true;
+
+            axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
+
+                let taskNotDone = response.data.filter(task => !task.done);
+
+                this.taskNotDoneCounter = taskNotDone.length;
+
+                this.store.loading = false;
+
+            }).catch((error) => {
+                console.error("Errore nella Chiamata API getTasks: ", error);
+            });
+        },
     },
 }
 </script>
 
 <template>
     <div class="main-content" v-if="!this.store.loading">
-        <div class="container border rounded-5 shadow my-5">
-            <div class="row justify-content-center py-5">
-                <div class="col-12 d-flex align-items-center">
-                    <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus, minus harum. Voluptatibus quibusdam alias neque placeat mollitia qui ex fugit, distinctio, vel quisquam aliquid quas facilis blanditiis, fuga earum maiores.
-                    </p>
+        <div class="container-fluid px-5">
+            <div class="container-fluid border rounded-4 shadow my-5">
+                <div class="row py-5">
+                    <div class="col-12 d-flex align-items-center">
+                        <span v-if="!taskNotDoneCounter">Nessuna task da completare</span>
+                        <span v-else>Task da completare: {{ taskNotDoneCounter }}</span>
+                    </div>
                 </div>
             </div>
         </div>

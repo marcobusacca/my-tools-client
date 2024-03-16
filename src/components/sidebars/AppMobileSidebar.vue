@@ -15,8 +15,8 @@ export default {
                 <div class="row" :class="theme + '-router-row'" data-bs-dismiss="offcanvas">
                     <router-link class="col-12 router-link py-4" :class="[theme + '-router-link', { 'active-router-link': $route.name === 'home-page' }]" :to="{ name: 'home-page' }">
                         <div class="row">
-                            <div class="col-4 d-flex justify-content-end align-items-center">
-                                <i class="fa-solid fa-house"></i>
+                            <div class="col-4 d-flex justify-content-center align-items-center">
+                                <i class="fa-solid fa-house fa-lg"></i>
                             </div>
                             <div class="col-8">
                                 <span>Home Page</span>
@@ -25,8 +25,8 @@ export default {
                     </router-link>
                     <router-link class="col-12 router-link py-4" :class="[theme + '-router-link', { 'active-router-link': $route.name === 'todo-list' }]" :to="{ name: 'todo-list' }">
                         <div class="row">
-                            <div class="col-4 d-flex justify-content-end align-items-center">
-                                <i class="fa-solid fa-list"></i>
+                            <div class="col-4 d-flex justify-content-center align-items-center">
+                                <i class="fa-solid fa-list fa-lg"></i>
                             </div>
                             <div class="col-8">
                                 <span>Todo List</span>

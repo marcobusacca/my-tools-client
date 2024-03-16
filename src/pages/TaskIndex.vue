@@ -241,6 +241,7 @@ export default {
         },
         cancelConfirmDeleteTaskModal(){
             this.taskActive = {};
+            this.getTasks();
         },
         deleteTask(id){
             // FACCIO PARTIRE IL LOADING
@@ -252,8 +253,6 @@ export default {
                 console.log(response);
 
                 this.cancelConfirmDeleteTaskModal();
-
-                this.getTasks();
 
             }).catch((error) => {
                 // STAMPO IN CONSOLE L'ERRORE
@@ -279,9 +278,9 @@ export default {
 
 <template>
     <div class="main-content" v-if="!this.store.loading">
-        <div class="container-fluid">
+        <div class="container-fluid px-5">
             <!-- CONTAINER TASK NOT DONE -->
-            <div class="container border rounded-5 shadow my-5">
+            <div class="container-fluid border rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
                     <div class="col-12">
@@ -350,7 +349,7 @@ export default {
                 </div>
             </div>
             <!-- CONTAINER TASK DONE -->
-            <div class="container border rounded-5 shadow my-5">
+            <div class="container-fluid border rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
                     <div class="col-12 px-5">
