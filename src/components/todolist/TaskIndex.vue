@@ -13,6 +13,9 @@ export default {
     data() {
         return {
             store,
+            yesterdayDate: null,
+            todayDate: null,
+            tomorrowDate: null,
 
             isTasksCategoriesEmpty: false,
 
@@ -28,21 +31,56 @@ export default {
             formErrors: {},
         }
     },
+    mounted() {
+        this.getYesterdayDate();
+        this.getTodayDate();
+        this.getTomorrowDate();
+    },
     methods: {
-        setTaskDone(id) {
-            // FACCIO PARTIRE IL LOADING
-            this.store.loading = true;
+        getYesterdayDate(){
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = now.getMonth() + 1;
+            let day = now.getDate() - 1;
 
-            // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
-            axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then((response) => {
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
 
-                // AGGIORNO LE TASKS
-                this.getTasks();
+            this.yesterdayDate = `${year}-${month}-${day}`;
+        },
+        getTodayDate(){
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = now.getMonth() + 1;
+            let day = now.getDate();
 
-            }).catch((error) => {
-                // STAMPO IN CONSOLE L'ERRORE
-                console.error("Errore nella Chiamata API setTaskDone: ", error);
-            });
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+
+            this.todayDate = `${year}-${month}-${day}`;
+        },
+        getTomorrowDate(){
+            let now = new Date();
+            let year = now.getFullYear();
+            let month = now.getMonth() + 1;
+            let day = now.getDate() + 1;
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+
+            this.tomorrowDate = `${year}-${month}-${day}`;
         },
         /*
             INIZIO GESTIONE TASK FORM
@@ -108,7 +146,7 @@ export default {
             if (!Object.keys(this.taskActive).length) { // SE TASK_ACTIVE È VUOTO, L'UTENTE STA CREANDO UNA TASK
 
                 // EFFETTUO LA CHIAMATA POST PER CREARE LA TASK
-                axios.post(`${this.store.baseUrl}/api/tasks`, this.newTask).then((response) => {
+                axios.post(`${this.store.baseUrl}/api/tasks`, this.newTask).then(() => {
 
                     // CHIUDO LA MODALE "TASK_FORM_MODAL"
                     this.closeTaskFormModal();
@@ -124,7 +162,7 @@ export default {
             } else { // SE TASK_ACTIVE NON È VUOTO, L'UTENTE STA MODIFICANDO UNA TASK
 
                 // EFFETTUO LA CHIAMATA PUT PER MODIFICARE LA TASK
-                axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.newTask).then((response) => {
+                axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.newTask).then(() => {
 
                     // CHIUDO LA MODALE "TASK_FORM_MODAL"
                     this.closeTaskFormModal();
@@ -172,7 +210,7 @@ export default {
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA DELETE PER CANCELLARE LA TASK
-            axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then((response) => {
+            axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then(() => {
 
                 this.cancelConfirmDeleteTaskModal();
 
@@ -184,6 +222,21 @@ export default {
         /*
             FINE GESTIONE TASK DELETE
         */
+        setTaskDone(id) {
+            // FACCIO PARTIRE IL LOADING
+            this.store.loading = true;
+
+            // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
+            axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then(() => {
+
+                // AGGIORNO LE TASKS
+                this.getTasks();
+
+            }).catch((error) => {
+                // STAMPO IN CONSOLE L'ERRORE
+                console.error("Errore nella Chiamata API setTaskDone: ", error);
+            });
+        },
     },
 }
 </script>
@@ -246,7 +299,10 @@ export default {
                                     <!-- TASK TITLE -->
                                     <td v-text="task.title"></td>
                                     <!-- TASK DATE -->
-                                    <td v-text="`${task.date ? task.formattedDate : '-'}`"></td>
+                                    <td v-if="task.date == yesterdayDate">Ieri</td>
+                                    <td v-if="task.date == todayDate">Oggi</td>
+                                    <td v-if="task.date == tomorrowDate">Domani</td>
+                                    <td v-text="`${task.date ? task.formattedDate : '-'}`" v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate"></td>
                                     <!-- TASK TIME -->
                                     <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
                                     <!-- TASK TOOLS -->
@@ -308,7 +364,10 @@ export default {
                                     <!-- TASK TITLE -->
                                     <td v-text="task.title"></td>
                                     <!-- TASK DATE -->
-                                    <td v-text="`${task.date ? task.formattedDate : '-'}`"></td>
+                                    <td v-if="task.date == yesterdayDate">Ieri</td>
+                                    <td v-if="task.date == todayDate">Oggi</td>
+                                    <td v-if="task.date == tomorrowDate">Domani</td>
+                                    <td v-text="`${task.date ? task.formattedDate : '-'}`" v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate"></td>
                                     <!-- TASK TIME -->
                                     <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
                                     <!-- TASK TOOLS -->

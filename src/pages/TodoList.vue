@@ -142,16 +142,16 @@ export default {
 
 <template>
     <div class="main-content" v-if="!store.loading && !isTaskIndexActive && !isTaskCategoryIndexActive">
-        <div class="container-fluid px-5">
+        <div class="container-fluid px-lg-5">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-6 px-2" @click="toggleTaskIndex()">
+                    <div class="col-12 col-lg-6 px-2 my-3 my-lg-0" @click="toggleTaskIndex()">
                         <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
                             <i class="fa-solid fa-circle-check fa-xl mx-2"></i>
                             <h2 class="fs-2 mx-2">Tasks</h2>
                         </div>
                     </div>
-                    <div class="col-6 px-2" @click="toggleTaskCategoryIndex()">
+                    <div class="col-12 col-lg-6 px-2 my-3 my-lg-0" @click="toggleTaskCategoryIndex()">
                         <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
                             <i class="fa-solid fa-clipboard-list fa-xl mx-2"></i>
                             <h2 class="fs-2 mx-2">Categorie</h2>
