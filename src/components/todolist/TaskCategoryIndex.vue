@@ -234,7 +234,7 @@ export default {
                                 @click="cancelTaskCategoryFormModal"></button>
                         </div>
                         <!-- MODAL BODY -->
-                        <div class="modal-body">
+                        <div class="modal-body py-5">
                             <!-- CONTAINER MESSAGGI DI ERRORI -->
                             <div class="alert alert-danger" v-if="Object.keys(formErrors).length > 0">
                                 <ul>
@@ -242,7 +242,7 @@ export default {
                                 </ul>
                             </div>
                             <!-- INPUT TITOLO -->
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <label class="input-group-text" for="task-title">Titolo*</label>
                                 <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
                                     v-model="newTaskCategory.title" @keyup.enter="taskCategorySubmitForm">
@@ -264,7 +264,7 @@ export default {
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK CATEGORY MODAL -->
-            <div class="modal fade" id="confirmDeleteTaskCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteTaskCategoryModalLabel" aria-hidden="true">
+            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteTaskCategoryModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
@@ -278,11 +278,11 @@ export default {
                                 @click="cancelConfirmDeleteTaskCategoryModal()"></button>
                         </div>
                         <!-- MODAL BODY -->
-                        <div class="modal-body">
-                            <div class="mb-4">
+                        <div class="modal-body py-5">
+                            <div class="mb-5">
                                 Tutte le task associate a questa categoria verranno automaticamente cancellate!
                             </div>
-                            <div class="mb-4">
+                            <div class="mt-5">
                                 Sei sicuro di voler eliminare la categoria: "{{ taskCategoryActive.title }}"?
                             </div>
                         </div>

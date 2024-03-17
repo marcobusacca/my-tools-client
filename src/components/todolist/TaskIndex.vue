@@ -225,6 +225,7 @@ export default {
                             <thead>
                                 <tr>
                                     <th scope="col">Completata</th>
+                                    <th scope="col">Categoria</th>
                                     <th scope="col">Titolo</th>
                                     <th scope="col">Data</th>
                                     <th scope="col">Ora</th>
@@ -240,6 +241,8 @@ export default {
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
                                             :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
                                     </td>
+                                    <!-- TASK CATEGORY TITLE -->
+                                    <td v-text="task.taskCategory.title"></td>
                                     <!-- TASK TITLE -->
                                     <td v-text="task.title"></td>
                                     <!-- TASK DATE -->
@@ -262,7 +265,7 @@ export default {
                                 </tr>
                                 <!-- TASK EMPTY MESSAGE -->
                                 <tr v-if="!tasksNotDone.length">
-                                    <td colspan="5" class="text-center py-4">Nessuna task da completare</td>
+                                    <td colspan="6" class="text-center py-4">Nessuna task da completare</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -284,6 +287,7 @@ export default {
                             <thead>
                                 <tr>
                                     <th scope="col">Completata</th>
+                                    <th scope="col">Categoria</th>
                                     <th scope="col">Titolo</th>
                                     <th scope="col">Data</th>
                                     <th scope="col">Ora</th>
@@ -299,6 +303,8 @@ export default {
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
                                             :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
                                     </td>
+                                    <!-- TASK CATEGORY TITLE -->
+                                    <td v-text="task.taskCategory.title"></td>
                                     <!-- TASK TITLE -->
                                     <td v-text="task.title"></td>
                                     <!-- TASK DATE -->
@@ -321,7 +327,7 @@ export default {
                                 </tr>
                                 <!-- TASK EMPTY MESSAGE -->
                                 <tr v-if="!tasksDone.length">
-                                    <td colspan="5" class="text-center py-4">Nessuna task completata</td>
+                                    <td colspan="6" class="text-center py-4">Nessuna task completata</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -344,7 +350,7 @@ export default {
                                 @click="cancelTaskFormModal"></button>
                         </div>
                         <!-- MODAL BODY -->
-                        <div class="modal-body" v-if="!isTasksCategoriesEmpty">
+                        <div class="modal-body py-5" v-if="!isTasksCategoriesEmpty">
                             <!-- CONTAINER MESSAGGI DI ERRORI -->
                             <div class="alert alert-danger" v-if="Object.keys(formErrors).length > 0">
                                 <ul>
@@ -378,7 +384,7 @@ export default {
                                 </select>
                             </div>
                             <!-- SELECT CATEGORIA -->
-                            <div class="input-group mb-3">
+                            <div class="input-group">
                                 <label class="input-group-text" for="task-category">Categoria*</label>
                                 <select class="form-select" id="task-category" v-model="newTask.taskCategory">
                                     <option v-for="taskCategory in tasksCategories" :key="taskCategory.id" :value="taskCategory"
@@ -410,7 +416,7 @@ export default {
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK MODAL -->
-            <div class="modal fade" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                 aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
@@ -425,7 +431,7 @@ export default {
                                 @click="cancelConfirmDeleteTaskModal()"></button>
                         </div>
                         <!-- MODAL BODY -->
-                        <div class="modal-body">
+                        <div class="modal-body py-5">
                             Sei sicuro di voler eliminare: "{{ taskActive.title }}"?
                         </div>
                         <!-- MODAL FOOTER -->
