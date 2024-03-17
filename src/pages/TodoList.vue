@@ -142,7 +142,7 @@ export default {
 
 <template>
     <div class="main-content" v-if="!store.loading && !isTaskIndexActive && !isTaskCategoryIndexActive">
-        <div class="container-fluid px-lg-5">
+        <div class="container-fluid px-lg-5 animate__animated animate__fadeInDown animate__faster">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 col-lg-6 px-2 my-3 my-lg-0" @click="toggleTaskIndex()">
