@@ -39,7 +39,7 @@ export default {
         <div class="container-fluid px-5">
             <div class="container-fluid border rounded-4 shadow my-5">
                 <div class="row py-5">
-                    <div class="col-12 d-flex align-items-center">
+                    <div class="col-12 d-flex align-items-center px-4">
                         <span v-if="!taskNotDoneCounter">Nessuna task da completare</span>
                         <span v-else>Task da completare: {{ taskNotDoneCounter }}</span>
                     </div>

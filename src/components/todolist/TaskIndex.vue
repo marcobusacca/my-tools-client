@@ -1,17 +1,18 @@
 <script>
-import { store } from '../store';
+import { store } from '../../store';
 import axios from 'axios';
 
 export default {
     inject: ['theme'],
+    props: {
+        tasksNotDone: Array,
+        tasksDone: Array,
+        tasksCategories: Array,
+        getTasks: Function,
+    },
     data() {
         return {
             store,
-
-            tasksNotDone: [],
-            tasksDone: [],
-
-            tasksCategories: [],
 
             taskActive: {},
             taskFormTitle: null,
@@ -20,98 +21,18 @@ export default {
                 date: "",
                 time: "",
                 done: false,
-                taskCategory: {},
+                taskCategory: this.tasksCategories[0],
             },
             formErrors: {},
         }
     },
-    mounted() {
-        this.getTasks();
-        this.getTasksCategories();
-    },
     methods: {
-        getTasks() {
-            // FACCIO PARTIRE IL LOADING
-            this.store.loading = true;
-
-            // SVUOTO GLI ARRAY DELLE TASKS
-            this.tasksNotDone = [];
-            this.tasksDone = [];
-
-            // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DI TASKS
-            axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
-
-                // DICHIARO GLI ARRAY PER SUDDIVIDERE LE TASK
-                let rawTasksNotDone = [];
-                let rawTasksDone = [];
-
-                // INSERISCO LE TASKS NEI RISPETTIVI ARRAY
-                response.data.forEach(task => {
-                    if (!task.done) {
-                        rawTasksNotDone.push(task);
-                    } else {
-                        rawTasksDone.push(task);
-                    }
-                });
-
-                // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
-                this.tasksNotDone = rawTasksNotDone.map(task => ({
-                    // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
-                    ...task,
-                    // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
-                    formattedDate: this.formatItalianDate(task.date),
-                    // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
-                    formattedTime: this.formatItalianTime(task.time),
-                }));
-
-                // MAPPO L'ARRAY DELLE "TASKS_DONE"
-                this.tasksDone = rawTasksDone.map(task => ({
-                    // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
-                    ...task,
-                    // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
-                    formattedDate: this.formatItalianDate(task.date),
-                    // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
-                    formattedTime: this.formatItalianTime(task.time),
-                }));
-
-                // FERMO IL LOADING
-                this.store.loading = false;
-
-            }).catch((error) => {
-                // STAMPO IN CONSOLE L'ERRORE
-                console.error("Errore nella Chiamata API getTasks: ", error);
-            });
-        },
-        getTasksCategories() {
-            // FACCIO PARTIRE IL LOADING
-            this.store.loading = true;
-
-            // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DELLE TASKS_CATEGORIES
-            axios.get(`${this.store.baseUrl}/api/tasks/categories`).then((response) => {
-
-                // SALVO IL RISULTATO IN TASKS_CATEGORIES
-                this.tasksCategories = response.data;
-
-                // SETTO LA PRIMA CATEGORIA IN NEW_TASK.TASK_CATEGORY
-                this.newTask.taskCategory = this.tasksCategories[0];
-
-                // FERMO IL LOADING
-                this.store.loading = false;
-
-            }).catch((error) => {
-                // STAMPO IN CONSOLE L'ERRORE
-                console.error("Errore nella Chiamata API getTasksCategories: ", error);
-            });
-        },
         setTaskDone(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
             axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then((response) => {
-
-                // STAMPO IN CONSOLE IL RISULTATO
-                console.log(response);
 
                 // AGGIORNO LE TASKS
                 this.getTasks();
@@ -180,9 +101,6 @@ export default {
                 // EFFETTUO LA CHIAMATA POST PER CREARE LA TASK
                 axios.post(`${this.store.baseUrl}/api/tasks`, this.newTask).then((response) => {
 
-                    // STAMPO IN CONSOLE LA RISPOSTA
-                    console.log(response);
-
                     // CHIUDO LA MODALE "TASK_FORM_MODAL"
                     this.closeTaskFormModal();
 
@@ -198,9 +116,6 @@ export default {
 
                 // EFFETTUO LA CHIAMATA PUT PER MODIFICARE LA TASK
                 axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.newTask).then((response) => {
-
-                    // STAMPO IN CONSOLE LA RISPOSTA
-                    console.log(response);
 
                     // CHIUDO LA MODALE "TASK_FORM_MODAL"
                     this.closeTaskFormModal();
@@ -250,8 +165,6 @@ export default {
             // EFFETTUO LA CHIAMATA DELETE PER CANCELLARE LA TASK
             axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then((response) => {
 
-                console.log(response);
-
                 this.cancelConfirmDeleteTaskModal();
 
             }).catch((error) => {
@@ -262,16 +175,6 @@ export default {
         /*
             FINE GESTIONE TASK DELETE
         */
-        formatItalianDate(originalDate) {
-            const options = { day: "numeric", month: "numeric", year: "numeric" };
-            const date = new Date(originalDate);
-            return date.toLocaleDateString("it-IT", options);
-        },
-        formatItalianTime(originalTime) {
-            const options = { hour: "numeric", minute: "numeric" };
-            const time = new Date(`1970-01-01T${originalTime}`);
-            return time.toLocaleTimeString("it-IT", options);
-        },
     },
 }
 </script>
@@ -279,7 +182,15 @@ export default {
 <template>
     <div class="main-content" v-if="!this.store.loading">
         <div class="container-fluid px-5">
-            <!-- CONTAINER TASK NOT DONE -->
+            <!-- CONTAINER OF RETURN BUTTON -->
+            <div class="container-fluid my-5">
+                <div class="row">
+                    <div class="col-12">
+                        <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`" @click="$emit('close-page')"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- CONTAINER TASKS NOT DONE -->
             <div class="container-fluid border rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
@@ -334,7 +245,8 @@ export default {
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- BUTTON DELETE -->
-                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
+                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -348,7 +260,7 @@ export default {
                     </div>
                 </div>
             </div>
-            <!-- CONTAINER TASK DONE -->
+            <!-- CONTAINER TASKS DONE -->
             <div class="container-fluid border rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
@@ -392,7 +304,8 @@ export default {
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- BUTTON DELETE -->
-                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
+                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -412,7 +325,7 @@ export default {
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
-                    <div class="modal-content" :class="theme + '-mode-task-modals'">
+                    <div class="modal-content" :class="`${theme}-mode-task-modals`">
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
@@ -438,12 +351,14 @@ export default {
                             <!-- INPUT DATA -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-date">Data</label>
-                                <input type="date" class="form-control" id="task-date" v-model="this.newTask.date" @keyup.enter="taskSubmitForm">
+                                <input type="date" class="form-control" id="task-date" v-model="this.newTask.date"
+                                    @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- INPUT ORA -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-time">Ora</label>
-                                <input type="time" class="form-control" id="task-time" v-model="this.newTask.time" @keyup.enter="taskSubmitForm">
+                                <input type="time" class="form-control" id="task-time" v-model="this.newTask.time"
+                                    @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- SELECT DONE -->
                             <div class="input-group mb-3">
@@ -471,25 +386,26 @@ export default {
                             <button type="button" class="btn"
                                 :class="!Object.keys(this.taskActive).length ? 'btn-success' : 'btn-warning'"
                                 @click="taskSubmitForm">{{
-                                    !Object.keys(this.taskActive).length ? 'Crea' : 'Modifica'
+                                !Object.keys(this.taskActive).length ? 'Crea' : 'Modifica'
                                 }}</button>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK MODAL -->
-            <div class="modal fade" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false"
-                tabindex="-1" aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
+            <div class="modal fade" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
-                    <div class="modal-content" :class="theme + '-mode-task-modals'">
+                    <div class="modal-content" :class="`${theme}-mode-task-modals`">
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
                             <h1 class="modal-title fs-5" id="confirmDeleteTaskModalLabel">Conferma eliminazione task</h1>
                             <!-- BUTTON CLOSE -->
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="cancelConfirmDeleteTaskModal()"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                @click="cancelConfirmDeleteTaskModal()"></button>
                         </div>
                         <!-- MODAL BODY -->
                         <div class="modal-body">
@@ -498,9 +414,11 @@ export default {
                         <!-- MODAL FOOTER -->
                         <div class="modal-footer">
                             <!-- BUTTON ANNULLA -->
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="cancelConfirmDeleteTaskModal()">Annulla</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                @click="cancelConfirmDeleteTaskModal()">Annulla</button>
                             <!-- SUBMIT BUTTON: DELETE TASK -->
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteTask(taskActive.id)">Elimina</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                                @click="deleteTask(taskActive.id)">Elimina</button>
                         </div>
                     </div>
                 </div>

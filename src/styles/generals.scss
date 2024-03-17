@@ -23,8 +23,24 @@ main {
     padding-top: 70px;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.icon {
+    cursor: pointer;
+}
+
 .router-link {
     text-decoration: none;
+}
+
+.sidebar-router-link {
+    font-weight: bold;
+
+    span {
+        font-size: 18px;
+    }
 }
 
 .active-router-link {
@@ -44,14 +60,6 @@ main {
 
     .desktop-main-sidebar {
         width: 300px;
-
-        .router-link {
-            font-weight: bold;
-
-            span {
-                font-size: 18px;
-            }
-        }
     }
 
     .main-content {
@@ -71,23 +79,27 @@ body.light-mode {
         background-color: $BgColorLightMode;
         color: $TextColorLightMode;
     }
+
+    i.light-icon {
+        color: black;
+    }
 }
 
 header.light-mode {
     background-color: $BgColorLightMode;
     color: $TextColorLightMode;
+}
 
-    .router-link {
-        color: $TextColorLightMode;
-    }
+.light-router-link {
+    color: $TextColorLightMode;
 }
 
 .main-sidebar {
 
-    .light-router-row {
+    .light-sidebar-router-row {
         border-top: 3px solid rgb(235, 235, 235);
 
-        .light-router-link {
+        .light-sidebar-router-link {
             border-bottom: 3px solid rgb(235, 235, 235);
             color: $TextColorLightMode;
         }
@@ -106,6 +118,10 @@ body.dark-mode {
         color: $TextColorDarkMode;
     }
 
+    i.dark-icon {
+        color: white;
+    }
+
     .dark-mode-task-modals {
         background-color: $BgColorDarkMode;
         color: $TextColorDarkMode;
@@ -116,22 +132,22 @@ header.dark-mode {
     background-color: $BgColorDarkMode;
     color: $TextColorDarkMode;
 
-    .router-link {
-        color: $TextColorDarkMode;
-    }
-
     .dark-mobile-sidebar {
         background-color: $BgColorDarkMode;
         color: $TextColorDarkMode;
     }
 }
 
+.dark-router-link {
+    color: $TextColorDarkMode;
+}
+
 .main-sidebar {
 
-    .dark-router-row {
+    .dark-sidebar-router-row {
         border-top: 3px solid rgb(63, 63, 63);
 
-        .dark-router-link {
+        .dark-sidebar-router-link {
             border-bottom: 3px solid rgb(63, 63, 63);
             color: $TextColorDarkMode;
         }

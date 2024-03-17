@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 // IMPORTARE TUTTE LE PAGINE DALLA CARTELLA "PAGES"
 import HomePage from './pages/HomePage.vue';
-import TaskIndex from './pages/TaskIndex.vue';
-
+import TodoList from './pages/TodoList.vue';
 
 // CREIAMO IL ROUTER CON LE SUE ROTTE
 const router = createRouter({
@@ -19,7 +18,7 @@ const router = createRouter({
         {
             path: '/todo-list',
             name: 'todo-list',
-            component: TaskIndex,
+            component: TodoList,
         },
         // {
         //     path: '/:catchAll(.*)',

@@ -9,13 +9,13 @@ export default {
 </script>
 
 <template>
-    <header :class="theme + '-mode'" class="shadow">
+    <header :class="`${theme}-mode`" class="shadow">
         <div class="container-fluid text-center py-3 h-100">
             <div class="row">
                 <!-- WEB-APP LOGO (DESKTOP) || OFFCANVAS HAMBURGER BUTTON (MOBILE) -->
                 <div class="col-6 justify-content-center align-items-center d-none d-lg-flex">
                     <h1>
-                        <router-link class="router-link text-decoration-none"
+                        <router-link class="router-link text-decoration-none" :class="`${theme}-router-link`"
                             :to="{ name: 'home-page' }">MY-TOOLS</router-link>
                     </h1>
                 </div>
