@@ -14,6 +14,8 @@ export default {
         return {
             store,
 
+            isTasksCategoriesEmpty: false,
+
             taskActive: {},
             taskFormTitle: null,
             newTask: {
@@ -45,25 +47,32 @@ export default {
         /*
             INIZIO GESTIONE TASK FORM
         */
-        taskFormModal(task) {
+        showTaskFormModal(task) {
 
-            this.taskActive = task;
+            if(this.tasksCategories.length > 0){
 
-            if (Object.keys(this.taskActive).length > 0) {
+                this.taskActive = task;
+    
+                if (Object.keys(this.taskActive).length > 0) {
+    
+                    this.taskFormTitle = `Modifica: '${task.title}'`;
+    
+                    this.newTask = {
+                        title: this.taskActive.title,
+                        date: this.taskActive.date,
+                        time: this.taskActive.time,
+                        done: this.taskActive.done,
+                        taskCategory: this.taskActive.taskCategory,
+                    };
 
-                this.taskFormTitle = task.title;
+                } else {
+                    this.taskFormTitle = "Crea una nuova task";
+                }
 
-                this.newTask = {
-                    title: this.taskActive.title,
-                    date: this.taskActive.date,
-                    time: this.taskActive.time,
-                    done: this.taskActive.done,
-                    taskCategory: this.taskActive.taskCategory,
-                };
             } else {
-                this.taskFormTitle = "Crea una nuova task";
+                this.taskFormTitle = "Nessuna categoria trovata";
+                this.isTasksCategoriesEmpty = true;
             }
-
         },
         cancelTaskFormModal() {
             this.taskActive = {};
@@ -151,7 +160,7 @@ export default {
         /*
             INIZIO GESTIONE TASK DELETE
         */
-        confirmDeleteTaskModal(task){
+        showConfirmDeleteTaskModal(task){
             this.taskActive = task;
         },
         cancelConfirmDeleteTaskModal(){
@@ -180,7 +189,7 @@ export default {
 </script>
 
 <template>
-    <div class="main-content" v-if="!this.store.loading">
+    <div class="main-content" v-if="!store.loading">
         <div class="container-fluid px-5">
             <!-- CONTAINER OF RETURN BUTTON -->
             <div class="container-fluid my-5">
@@ -191,7 +200,7 @@ export default {
                 </div>
             </div>
             <!-- CONTAINER TASKS NOT DONE -->
-            <div class="container-fluid border rounded-4 shadow my-5">
+            <div class="container-fluid rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
                     <div class="col-12">
@@ -203,7 +212,7 @@ export default {
                             <!-- CREATE TASK BUTTON -->
                             <div class="col-6 text-end px-5">
                                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#taskFormModal"
-                                    @click="taskFormModal({})">
+                                    @click="showTaskFormModal({})">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
@@ -241,12 +250,12 @@ export default {
                                     <td>
                                         <!-- BUTTON EDIT -->
                                         <button class="btn btn-warning mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#taskFormModal" @click="taskFormModal(task)">
+                                            data-bs-target="#taskFormModal" @click="showTaskFormModal(task)">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- BUTTON DELETE -->
                                         <button class="btn btn-danger mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
+                                            data-bs-target="#confirmDeleteTaskModal" @click="showConfirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -261,7 +270,7 @@ export default {
                 </div>
             </div>
             <!-- CONTAINER TASKS DONE -->
-            <div class="container-fluid border rounded-4 shadow my-5">
+            <div class="container-fluid rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
                     <div class="col-12 px-5">
@@ -300,12 +309,12 @@ export default {
                                     <td>
                                         <!-- BUTTON EDIT -->
                                         <button class="btn btn-warning mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#taskFormModal" @click="taskFormModal(task)">
+                                            data-bs-target="#taskFormModal" @click="showTaskFormModal(task)">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- BUTTON DELETE -->
                                         <button class="btn btn-danger mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#confirmDeleteTaskModal" @click="confirmDeleteTaskModal(task)">
+                                            data-bs-target="#confirmDeleteTaskModal" @click="showConfirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -325,17 +334,17 @@ export default {
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
-                    <div class="modal-content" :class="`${theme}-mode-task-modals`">
+                    <div class="modal-content" :class="`${theme}-mode-modal`">
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
-                            <h1 class="modal-title fs-5" id="taskFormModalLabel" v-text="this.taskFormTitle"></h1>
+                            <h1 class="modal-title fs-5" id="taskFormModalLabel" v-text="taskFormTitle" :class="isTasksCategoriesEmpty ? 'text-danger' : ''"></h1>
                             <!-- BUTTON CLOSE -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 @click="cancelTaskFormModal"></button>
                         </div>
                         <!-- MODAL BODY -->
-                        <div class="modal-body">
+                        <div class="modal-body" v-if="!isTasksCategoriesEmpty">
                             <!-- CONTAINER MESSAGGI DI ERRORI -->
                             <div class="alert alert-danger" v-if="Object.keys(formErrors).length > 0">
                                 <ul>
@@ -346,24 +355,24 @@ export default {
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-title">Titolo*</label>
                                 <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
-                                    v-model="this.newTask.title" @keyup.enter="taskSubmitForm">
+                                    v-model="newTask.title" @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- INPUT DATA -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-date">Data</label>
-                                <input type="date" class="form-control" id="task-date" v-model="this.newTask.date"
+                                <input type="date" class="form-control" id="task-date" v-model="newTask.date"
                                     @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- INPUT ORA -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-time">Ora</label>
-                                <input type="time" class="form-control" id="task-time" v-model="this.newTask.time"
+                                <input type="time" class="form-control" id="task-time" v-model="newTask.time"
                                     @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- SELECT DONE -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-done">Task completata*</label>
-                                <select class="form-select" id="task-done" v-model="this.newTask.done">
+                                <select class="form-select" id="task-done" v-model="newTask.done">
                                     <option :value="false">No</option>
                                     <option :value="true">Si</option>
                                 </select>
@@ -371,23 +380,31 @@ export default {
                             <!-- SELECT CATEGORIA -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-category">Categoria*</label>
-                                <select class="form-select" id="task-category" v-model="this.newTask.taskCategory">
+                                <select class="form-select" id="task-category" v-model="newTask.taskCategory">
                                     <option v-for="taskCategory in tasksCategories" :key="taskCategory.id" :value="taskCategory"
                                         v-text="taskCategory.title"></option>
                                 </select>
                             </div>
                         </div>
+                        <div class="modal-body py-5" v-else>
+                            <span>Devi inserire almeno una categoria per poter creare delle task!</span>
+                        </div>
                         <!-- MODAL FOOTER -->
-                        <div class="modal-footer">
+                        <div class="modal-footer" v-if="!isTasksCategoriesEmpty">
                             <!-- BUTTON ANNULLA -->
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                                 @click="cancelTaskFormModal">Annulla</button>
                             <!-- SUBMIT BUTTON -->
                             <button type="button" class="btn"
-                                :class="!Object.keys(this.taskActive).length ? 'btn-success' : 'btn-warning'"
+                                :class="!Object.keys(taskActive).length ? 'btn-success' : 'btn-warning'"
                                 @click="taskSubmitForm">{{
-                                !Object.keys(this.taskActive).length ? 'Crea' : 'Modifica'
+                                !Object.keys(taskActive).length ? 'Crea' : 'Modifica'
                                 }}</button>
+                        </div>
+                        <div class="modal-footer" v-else>
+                            <!-- BUTTON ANNULLA -->
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                                @click="cancelTaskFormModal">Okay</button>
                         </div>
                     </div>
                 </div>
@@ -398,7 +415,7 @@ export default {
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
-                    <div class="modal-content" :class="`${theme}-mode-task-modals`">
+                    <div class="modal-content" :class="`${theme}-mode-modal`">
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->

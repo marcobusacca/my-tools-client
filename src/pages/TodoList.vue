@@ -20,6 +20,8 @@ export default {
 
             tasksCategories: [],
 
+            taskNotDoneCounter: 0,
+
             isTaskIndexActive: false,
             isTaskCategoryIndexActive: false,
         }
@@ -27,6 +29,7 @@ export default {
     mounted() {
         this.getTasks();
         this.getTasksCategories();
+        this.getTasksNotDoneCounter();
     },
     methods: {
         getTasks() {
@@ -99,8 +102,26 @@ export default {
                 console.error("Errore nella Chiamata API getTasksCategories: ", error);
             });
         },
+        getTasksNotDoneCounter(){
+
+            this.store.loading = true;
+
+            axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
+
+                let taskNotDone = response.data.filter(task => !task.done);
+
+                this.taskNotDoneCounter = taskNotDone.length;
+
+                this.store.loading = false;
+
+            }).catch((error) => {
+                console.error("Errore nella Chiamata API getTasks: ", error);
+            });
+        },
         toggleTaskIndex(){
             this.isTaskIndexActive = !this.isTaskIndexActive;
+            if(!this.isTaskIndexActive)
+                this.getTasksNotDoneCounter();
         },
         toggleTaskCategoryIndex(){
             this.isTaskCategoryIndexActive = !this.isTaskCategoryIndexActive;
@@ -120,28 +141,47 @@ export default {
 </script>
 
 <template>
-    <div class="main-content" v-if="!this.store.loading && !isTaskIndexActive && !isTaskCategoryIndexActive">
-        <div class="container-fluid px-5 h-100">
-            <div class="container-fluid h-100">
-                <div class="row h-100">
-                    <div class="col-12 d-flex justify-content-center align-items-center border-bottom">
-                        <div class="cursor-pointer d-flex justify-content-center align-items-center" @click="toggleTaskIndex()">
-                            <i class="fa-solid fa-circle-check fa-2xl mx-3"></i>
-                            <h2 class="d-inline-block fs-1 mx-3">Tasks</h2>
+    <div class="main-content" v-if="!store.loading && !isTaskIndexActive && !isTaskCategoryIndexActive">
+        <div class="container-fluid px-5">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-6 px-2" @click="toggleTaskIndex()">
+                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
+                            <i class="fa-solid fa-circle-check fa-xl mx-2"></i>
+                            <h2 class="fs-2 mx-2">Tasks</h2>
                         </div>
                     </div>
-                    <div class="col-12 d-flex justify-content-center align-items-center">
-                        <div class="cursor-pointer d-flex justify-content-center align-items-center" @click="toggleTaskCategoryIndex()">
-                            <i class="fa-solid fa-clipboard-list fa-2xl mx-3"></i>
-                            <h2 class="d-inline-block fs-1 mx-3">Categorie</h2>
+                    <div class="col-6 px-2" @click="toggleTaskCategoryIndex()">
+                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
+                            <i class="fa-solid fa-clipboard-list fa-xl mx-2"></i>
+                            <h2 class="fs-2 mx-2">Categorie</h2>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid rounded-4 shadow my-5">
+                <div class="row py-5">
+                    <div class="col-12 d-flex align-items-center px-4">
+                        <span v-if="!taskNotDoneCounter">Nessuna task da completare</span>
+                        <span v-else>Task da completare: {{ taskNotDoneCounter }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <task-index v-if="!this.store.loading && isTaskIndexActive && !isTaskCategoryIndexActive" :tasksNotDone="tasksNotDone" :tasksDone="tasksDone" :tasksCategories="tasksCategories" :getTasks="getTasks" @close-page="toggleTaskIndex()" />
-    <task-category-index v-if="!this.store.loading && !isTaskIndexActive && isTaskCategoryIndexActive" :tasksCategories="tasksCategories" :getTasksCategories="getTasksCategories" @close-page="toggleTaskCategoryIndex()" />
+    <!-- TASK-INDEX -->
+    <task-index v-if="!store.loading && isTaskIndexActive"
+    :tasksNotDone="tasksNotDone"
+    :tasksDone="tasksDone"
+    :tasksCategories="tasksCategories"
+    :getTasks="getTasks"
+    @close-page="toggleTaskIndex()" />
+    <!-- TASK-CATEGORY-INDEX -->
+    <task-category-index v-if="!store.loading && isTaskCategoryIndexActive"
+    :tasksCategories="tasksCategories"
+    :getTasks="getTasks"
+    :getTasksCategories="getTasksCategories"
+    @close-page="toggleTaskCategoryIndex()" />
 </template>
 
 <style lang="scss" scoped></style>

@@ -15,7 +15,7 @@ export default {
                 <!-- WEB-APP LOGO (DESKTOP) || OFFCANVAS HAMBURGER BUTTON (MOBILE) -->
                 <div class="col-6 justify-content-center align-items-center d-none d-lg-flex">
                     <h1>
-                        <router-link class="router-link text-decoration-none" :class="`${theme}-router-link`"
+                        <router-link class="router-link" :class="`${theme}-router-link`"
                             :to="{ name: 'home-page' }">MY-TOOLS</router-link>
                     </h1>
                 </div>
