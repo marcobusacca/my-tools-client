@@ -243,7 +243,7 @@ export default {
 
 <template>
     <div class="main-content" v-if="!store.loading">
-        <div class="container-fluid px-5 animate__animated animate__zoomIn animate__faster">
+        <div class="container-fluid px-5">
             <!-- CONTAINER OF RETURN BUTTON -->
             <div class="container-fluid my-5">
                 <div class="row">
