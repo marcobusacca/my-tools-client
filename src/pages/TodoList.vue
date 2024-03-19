@@ -146,13 +146,13 @@ export default {
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 col-lg-6 px-2 my-3 my-lg-0" @click="toggleTaskIndex()">
-                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
+                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-5">
                             <i class="fa-solid fa-circle-check fa-xl mx-2"></i>
                             <h2 class="fs-2 mx-2">Tasks</h2>
                         </div>
                     </div>
                     <div class="col-12 col-lg-6 px-2 my-3 my-lg-0" @click="toggleTaskCategoryIndex()">
-                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-4">
+                        <div class="d-flex justify-content-center align-items-center shadow cursor-pointer py-5">
                             <i class="fa-solid fa-clipboard-list fa-xl mx-2"></i>
                             <h2 class="fs-2 mx-2">Categorie</h2>
                         </div>
