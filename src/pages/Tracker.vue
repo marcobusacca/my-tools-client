@@ -49,13 +49,15 @@ export default {
             this.store.loading = true;
 
             // SVUOTO L'ARRAY DEI WALLET
-            this.store.tracker.wallets = [];
+            this.store.tracker.activeWallets = [];
+            this.store.tracker.disabledWallets = [];
 
             // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DEI WALLETS
             axios.get(`${this.store.baseUrl}/api/tracker/wallets`).then((response) => {
 
-                // SALVO IL RISULTATO
-                this.store.tracker.wallets = response.data;
+                // SALVO E FILTRO IL RISULTATO
+                this.store.tracker.activeWallets = response.data.filter((wallet) => wallet.active);
+                this.store.tracker.disabledWallets = response.data.filter((wallet) => !wallet.active);
 
                 // FERMO IL LOADING
                 this.store.loading = false;

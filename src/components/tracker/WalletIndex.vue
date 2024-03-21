@@ -11,6 +11,8 @@ export default {
         return {
             store,
 
+            showDisabledWallets: false,
+
             walletActive: {},
             walletFormTitle: null,
             newWallet: {
@@ -21,7 +23,23 @@ export default {
         }
     },
     methods: {
+        toggleDisabledWallets() {
+            this.showDisabledWallets = !this.showDisabledWallets;
+        },
+        toggleWalletActive(id) {
+            // FACCIO PARTIRE IL LOADING
+            this.store.loading = true;
 
+            // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "ACTIVE" DEL WALLET
+            axios.put(`${this.store.baseUrl}/api/tracker/wallets/active/${id}`).then(() => {
+
+                // AGGIORNO I WALLETS
+                this.getWallets();
+
+            }).catch((error) => {
+                console.error("Errore nella Chiamata API toggleWalletActive: ", error);
+            });
+        },
     },
 }
 </script>
@@ -29,12 +47,22 @@ export default {
 <template>
     <div class="main-content" v-if="!store.loading">
         <div class="container-fluid px-5">
-            <!-- CONTAINER OF RETURN BUTTON -->
+            <!-- CONTAINER OF RETURN BUTTON AND SHOW DISABLED WALLET -->
             <div class="container-fluid my-5">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-6">
                         <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`"
                             @click="$emit('close-page')"></i>
+                    </div>
+                    <div class="col-6 d-flex justify-content-end" v-if="store.tracker.disabledWallets.length > 0">
+                        <div class="d-flex rounded-4 shadow p-3">
+                            <label class="mx-3">Wallet disabilitati</label>
+                            <div class="form-check form-switch d-flex justify-content-center"
+                                @click="toggleDisabledWallets()">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                    :checked="showDisabledWallets">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -72,10 +100,30 @@ export default {
                             <!-- TABLE BODY -->
                             <tbody>
                                 <!-- WALLET ROW -->
-                                <tr v-for="wallet in store.tracker.wallets" :key="wallet.id">
+                                <tr v-for="wallet in store.tracker.activeWallets" :key="wallet.id">
                                     <!-- ACTIVE -->
                                     <td>
-                                        <i :class="wallet.active ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+                                        <i role="button" :class="wallet.active ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                                            @click="toggleWalletActive(wallet.id)"></i>
+                                    </td>
+                                    <td v-text="wallet.name"></td>
+                                    <td v-text="wallet.balance"></td>
+                                    <td>
+                                        <!-- BUTTON EDIT -->
+                                        <!-- data-bs-toggle="modal"
+                                            data-bs-target="#taskCategoryFormModal"
+                                            @click="showTaskCategoryFormModal(taskCategory)" -->
+                                        <button class="btn btn-warning mx-1">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-for="wallet in store.tracker.disabledWallets" :key="wallet.id"
+                                    v-if="showDisabledWallets">
+                                    <!-- ACTIVE -->
+                                    <td>
+                                        <i role="button" :class="wallet.active ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                                            @click="toggleWalletActive(wallet.id)"></i>
                                     </td>
                                     <td v-text="wallet.name"></td>
                                     <td v-text="wallet.balance"></td>
@@ -90,9 +138,9 @@ export default {
                                     </td>
                                 </tr>
                                 <!-- WALLETS EMPTY MESSAGE -->
-                                <tr v-if="!store.tracker.wallets.length">
+                                <!-- <tr v-if="!store.tracker.activeWallets.length">
                                     <td colspan="4" class="text-center py-4">Nessun wallet trovato</td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>

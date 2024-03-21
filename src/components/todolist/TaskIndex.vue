@@ -217,7 +217,7 @@ export default {
         /*
             FINE GESTIONE TASK DELETE
         */
-        setTaskDone(id) {
+        toggleTaskDone(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
@@ -229,7 +229,7 @@ export default {
 
             }).catch((error) => {
                 // STAMPO IN CONSOLE L'ERRORE
-                console.error("Errore nella Chiamata API setTaskDone: ", error);
+                console.error("Errore nella Chiamata API toggleTaskDone: ", error);
             });
         },
     },
@@ -284,11 +284,11 @@ export default {
                             <!-- TABLE BODY -->
                             <tbody>
                                 <!-- TASKS ROWS -->
-                                <tr role="button" v-for="task in store.todolist.tasksNotDone" :key="task.id">
+                                <tr v-for="task in store.todolist.tasksNotDone" :key="task.id">
                                     <!-- TASK CHECKBOX -->
                                     <td>
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
-                                            :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
+                                            :id="task.id" :checked="task.done" @click="toggleTaskDone(task.id)">
                                     </td>
                                     <!-- TASK CATEGORY TITLE -->
                                     <td v-text="task.taskCategory.title"></td>
@@ -351,12 +351,12 @@ export default {
                             </thead>
                             <!-- TABLE BODY -->
                             <tbody>
-                                <!-- TASKS ROWS -->
-                                <tr role="button" v-for="task in store.todolist.tasksDone" :key="task.id">
+                                <!-- TASK ROW -->
+                                <tr v-for="task in store.todolist.tasksDone" :key="task.id">
                                     <!-- TASK CHECKBOX -->
                                     <td>
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
-                                            :id="task.id" :checked="task.done" @click="setTaskDone(task.id)">
+                                            :id="task.id" :checked="task.done" @click="toggleTaskDone(task.id)">
                                     </td>
                                     <!-- TASK CATEGORY TITLE -->
                                     <td v-text="task.taskCategory.title"></td>

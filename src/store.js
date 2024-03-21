@@ -7,7 +7,6 @@ export const store = reactive({
     loading: false,
 
     todolist: {
-        "tasks": [],
         "tasksNotDone": [],
         "tasksDone": [],
         "tasksCategories": [],
@@ -16,6 +15,7 @@ export const store = reactive({
 
     tracker: {
         "totalExpenses": [],
-        "wallets": [],
+        "activeWallets": [],
+        "disabledWallets": [],
     },
 });
