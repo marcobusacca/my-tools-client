@@ -5,9 +5,6 @@ import axios from 'axios';
 export default {
     inject: ['theme'],
     props: {
-        tasksNotDone: Array,
-        tasksDone: Array,
-        tasksCategories: Array,
         getTasks: Function,
     },
     data() {
@@ -21,23 +18,27 @@ export default {
 
             taskActive: {},
             taskFormTitle: null,
-            newTask: {
-                title: "",
-                date: "",
-                time: "",
-                done: false,
-                taskCategory: this.tasksCategories[0],
-            },
+            newTask: {},
             formErrors: {},
         }
     },
     mounted() {
+        this.setupNewTask();
         this.getYesterdayDate();
         this.getTodayDate();
         this.getTomorrowDate();
     },
     methods: {
-        getYesterdayDate(){
+        setupNewTask() {
+            this.newTask = {
+                title: "",
+                date: "",
+                time: "",
+                done: false,
+                taskCategory: this.store.todolist.tasksCategories[0],
+            };
+        },
+        getYesterdayDate() {
             let now = new Date();
             let year = now.getFullYear();
             let month = now.getMonth() + 1;
@@ -52,7 +53,7 @@ export default {
 
             this.yesterdayDate = `${year}-${month}-${day}`;
         },
-        getTodayDate(){
+        getTodayDate() {
             let now = new Date();
             let year = now.getFullYear();
             let month = now.getMonth() + 1;
@@ -67,7 +68,7 @@ export default {
 
             this.todayDate = `${year}-${month}-${day}`;
         },
-        getTomorrowDate(){
+        getTomorrowDate() {
             let now = new Date();
             let year = now.getFullYear();
             let month = now.getMonth() + 1;
@@ -87,14 +88,14 @@ export default {
         */
         showTaskFormModal(task) {
 
-            if(this.tasksCategories.length > 0){
+            if (this.store.todolist.tasksCategories.length > 0) {
 
                 this.taskActive = task;
-    
+
                 if (Object.keys(this.taskActive).length > 0) {
-    
+
                     this.taskFormTitle = `Modifica: '${task.title}'`;
-    
+
                     this.newTask = {
                         title: this.taskActive.title,
                         date: this.taskActive.date,
@@ -115,13 +116,7 @@ export default {
         cancelTaskFormModal() {
             this.taskActive = {};
             this.taskFormTitle = null;
-            this.newTask = {
-                title: "",
-                date: "",
-                time: "",
-                done: false,
-                taskCategory: this.tasksCategories[0],
-            };
+            this.setupNewTask();
             this.formErrors = {};
             this.getTasks();
         },
@@ -146,13 +141,13 @@ export default {
             if (!Object.keys(this.taskActive).length) { // SE TASK_ACTIVE È VUOTO, L'UTENTE STA CREANDO UNA TASK
 
                 // EFFETTUO LA CHIAMATA POST PER CREARE LA TASK
-                axios.post(`${this.store.baseUrl}/api/tasks`, this.newTask).then(() => {
-
-                    // CHIUDO LA MODALE "TASK_FORM_MODAL"
-                    this.closeTaskFormModal();
+                axios.post(`${this.store.baseUrl}/api/todolist/tasks`, this.newTask).then(() => {
 
                     // AVVIO "CANCEL_TASK_FORM_MODAL"
                     this.cancelTaskFormModal();
+
+                    // CHIUDO LA MODALE "TASK_FORM_MODAL"
+                    this.closeTaskFormModal();
 
                 }).catch((error) => {
                     // STAMPO IN CONSOLE L'ERRORE
@@ -162,13 +157,13 @@ export default {
             } else { // SE TASK_ACTIVE NON È VUOTO, L'UTENTE STA MODIFICANDO UNA TASK
 
                 // EFFETTUO LA CHIAMATA PUT PER MODIFICARE LA TASK
-                axios.put(`${this.store.baseUrl}/api/tasks/${this.taskActive.id}`, this.newTask).then(() => {
-
-                    // CHIUDO LA MODALE "TASK_FORM_MODAL"
-                    this.closeTaskFormModal();
+                axios.put(`${this.store.baseUrl}/api/todolist/tasks/${this.taskActive.id}`, this.newTask).then(() => {
 
                     // AVVIO "CANCEL_TASK_FORM_MODAL"
                     this.cancelTaskFormModal();
+
+                    // CHIUDO LA MODALE "TASK_FORM_MODAL"
+                    this.closeTaskFormModal();
 
                 }).catch((error) => {
                     // STAMPO IN CONSOLE L'ERRORE
@@ -198,19 +193,19 @@ export default {
         /*
             INIZIO GESTIONE TASK DELETE
         */
-        showConfirmDeleteTaskModal(task){
+        showConfirmDeleteTaskModal(task) {
             this.taskActive = task;
         },
-        cancelConfirmDeleteTaskModal(){
+        cancelConfirmDeleteTaskModal() {
             this.taskActive = {};
             this.getTasks();
         },
-        deleteTask(id){
+        deleteTask(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA DELETE PER CANCELLARE LA TASK
-            axios.delete(`${this.store.baseUrl}/api/tasks/${id}`).then(() => {
+            axios.delete(`${this.store.baseUrl}/api/todolist/tasks/${id}`).then(() => {
 
                 this.cancelConfirmDeleteTaskModal();
 
@@ -227,7 +222,7 @@ export default {
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA PUT PER AGGIORNARE LO STATO "DONE" DELLO TASK
-            axios.put(`${this.store.baseUrl}/api/tasks/done/${id}`).then(() => {
+            axios.put(`${this.store.baseUrl}/api/todolist/tasks/done/${id}`).then(() => {
 
                 // AGGIORNO LE TASKS
                 this.getTasks();
@@ -248,7 +243,8 @@ export default {
             <div class="container-fluid my-5">
                 <div class="row">
                     <div class="col-12">
-                        <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`" @click="$emit('close-page')"></i>
+                        <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`"
+                            @click="$emit('close-page')"></i>
                     </div>
                 </div>
             </div>
@@ -288,7 +284,7 @@ export default {
                             <!-- TABLE BODY -->
                             <tbody>
                                 <!-- TASKS ROWS -->
-                                <tr role="button" v-for="task in tasksNotDone" :key="task.id">
+                                <tr role="button" v-for="task in store.todolist.tasksNotDone" :key="task.id">
                                     <!-- TASK CHECKBOX -->
                                     <td>
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
@@ -302,7 +298,9 @@ export default {
                                     <td v-if="task.date == yesterdayDate">Ieri</td>
                                     <td v-if="task.date == todayDate">Oggi</td>
                                     <td v-if="task.date == tomorrowDate">Domani</td>
-                                    <td v-text="`${task.date ? task.formattedDate : '-'}`" v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate"></td>
+                                    <td v-text="`${task.date ? task.formattedDate : '-'}`"
+                                        v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate">
+                                    </td>
                                     <!-- TASK TIME -->
                                     <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
                                     <!-- TASK TOOLS -->
@@ -314,13 +312,14 @@ export default {
                                         </button>
                                         <!-- BUTTON DELETE -->
                                         <button class="btn btn-danger mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#confirmDeleteTaskModal" @click="showConfirmDeleteTaskModal(task)">
+                                            data-bs-target="#confirmDeleteTaskModal"
+                                            @click="showConfirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <!-- TASK EMPTY MESSAGE -->
-                                <tr v-if="!tasksNotDone.length">
+                                <tr v-if="!store.todolist.tasksNotDone.length">
                                     <td colspan="6" class="text-center py-4">Nessuna task da completare</td>
                                 </tr>
                             </tbody>
@@ -353,7 +352,7 @@ export default {
                             <!-- TABLE BODY -->
                             <tbody>
                                 <!-- TASKS ROWS -->
-                                <tr role="button" v-for="task in tasksDone" :key="task.id">
+                                <tr role="button" v-for="task in store.todolist.tasksDone" :key="task.id">
                                     <!-- TASK CHECKBOX -->
                                     <td>
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
@@ -367,7 +366,9 @@ export default {
                                     <td v-if="task.date == yesterdayDate">Ieri</td>
                                     <td v-if="task.date == todayDate">Oggi</td>
                                     <td v-if="task.date == tomorrowDate">Domani</td>
-                                    <td v-text="`${task.date ? task.formattedDate : '-'}`" v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate"></td>
+                                    <td v-text="`${task.date ? task.formattedDate : '-'}`"
+                                        v-if="task.date != yesterdayDate && task.date != todayDate && task.date != tomorrowDate">
+                                    </td>
                                     <!-- TASK TIME -->
                                     <td v-text="`${task.time ? task.formattedTime : '-'}`"></td>
                                     <!-- TASK TOOLS -->
@@ -379,13 +380,14 @@ export default {
                                         </button>
                                         <!-- BUTTON DELETE -->
                                         <button class="btn btn-danger mx-1" data-bs-toggle="modal"
-                                            data-bs-target="#confirmDeleteTaskModal" @click="showConfirmDeleteTaskModal(task)">
+                                            data-bs-target="#confirmDeleteTaskModal"
+                                            @click="showConfirmDeleteTaskModal(task)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <!-- TASK EMPTY MESSAGE -->
-                                <tr v-if="!tasksDone.length">
+                                <tr v-if="!store.todolist.tasksDone.length">
                                     <td colspan="6" class="text-center py-4">Nessuna task completata</td>
                                 </tr>
                             </tbody>
@@ -394,8 +396,8 @@ export default {
                 </div>
             </div>
             <!-- TASK TOOLS MODAL -->
-            <div class="modal modal-xl fade my-lg-5" id="taskFormModal" data-bs-backdrop="static" data-bs-keyboard="false"
-                tabindex="-1" aria-labelledby="taskFormModalLabel" aria-hidden="true">
+            <div class="modal modal-xl fade my-lg-5" id="taskFormModal" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="taskFormModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
@@ -403,7 +405,8 @@ export default {
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
-                            <h1 class="modal-title fs-5" id="taskFormModalLabel" v-text="taskFormTitle" :class="isTasksCategoriesEmpty ? 'text-danger' : ''"></h1>
+                            <h1 class="modal-title fs-5" id="taskFormModalLabel" v-text="taskFormTitle"
+                                :class="isTasksCategoriesEmpty ? 'text-danger' : ''"></h1>
                             <!-- BUTTON CLOSE -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 @click="cancelTaskFormModal"></button>
@@ -419,8 +422,9 @@ export default {
                             <!-- INPUT TITOLO -->
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="task-title">Titolo*</label>
-                                <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
-                                    v-model="newTask.title" @keyup.enter="taskSubmitForm">
+                                <input type="text" class="form-control" id="task-title"
+                                    placeholder="Inserisci il titolo" v-model="newTask.title"
+                                    @keyup.enter="taskSubmitForm">
                             </div>
                             <!-- INPUT DATA -->
                             <div class="input-group mb-3">
@@ -446,8 +450,9 @@ export default {
                             <div class="input-group">
                                 <label class="input-group-text" for="task-category">Categoria*</label>
                                 <select class="form-select" id="task-category" v-model="newTask.taskCategory">
-                                    <option v-for="taskCategory in tasksCategories" :key="taskCategory.id" :value="taskCategory"
-                                        v-text="taskCategory.title"></option>
+                                    <option v-for="taskCategory in store.todolist.tasksCategories"
+                                        :key="taskCategory.id" :value="taskCategory" v-text="taskCategory.title">
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -462,9 +467,8 @@ export default {
                             <!-- SUBMIT BUTTON -->
                             <button type="button" class="btn"
                                 :class="!Object.keys(taskActive).length ? 'btn-success' : 'btn-warning'"
-                                @click="taskSubmitForm">{{
-                                !Object.keys(taskActive).length ? 'Crea' : 'Modifica'
-                                }}</button>
+                                @click="taskSubmitForm">{{ !Object.keys(taskActive).length ? 'Crea' :
+        'Modifica' }}</button>
                         </div>
                         <div class="modal-footer" v-else>
                             <!-- BUTTON ANNULLA -->
@@ -475,8 +479,8 @@ export default {
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK MODAL -->
-            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
+            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskModal" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteTaskModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
@@ -484,7 +488,8 @@ export default {
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
-                            <h1 class="modal-title fs-5" id="confirmDeleteTaskModalLabel">Conferma eliminazione task</h1>
+                            <h1 class="modal-title fs-5" id="confirmDeleteTaskModalLabel">Conferma eliminazione task
+                            </h1>
                             <!-- BUTTON CLOSE -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 @click="cancelConfirmDeleteTaskModal()"></button>

@@ -5,4 +5,17 @@ import { reactive } from "vue";
 export const store = reactive({
     baseUrl: 'http://127.0.0.1:8080',
     loading: false,
+
+    todolist: {
+        "tasks": [],
+        "tasksNotDone": [],
+        "tasksDone": [],
+        "tasksCategories": [],
+        "taskNotDoneCounter": 0,
+    },
+
+    tracker: {
+        "totalExpenses": [],
+        "wallets": [],
+    },
 });

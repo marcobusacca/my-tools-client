@@ -5,7 +5,6 @@ import axios from 'axios';
 export default {
     inject: ['theme'],
     props: {
-        tasksCategories: Array,
         getTasks: Function,
         getTasksCategories: Function,
     },
@@ -71,8 +70,8 @@ export default {
             if (!Object.keys(this.taskCategoryActive).length) { // SE TASK_CATEGORY_ACTIVE È VUOTO, L'UTENTE STA CREANDO UNA TASK_CATEGORY
 
                 // EFFETTUO LA CHIAMATA POST PER CREARE LA TASK_CATEGORY
-                axios.post(`${this.store.baseUrl}/api/tasks/categories`, this.newTaskCategory).then(() => {
-                    
+                axios.post(`${this.store.baseUrl}/api/todolist/categories`, this.newTaskCategory).then(() => {
+
                     // RESETTO LE VARIABILI DI APPOGGIO E AGGIORNO LE CATEGORIE
                     this.cancelTaskCategoryFormModal();
 
@@ -87,7 +86,7 @@ export default {
             } else { // SE TASK_CATEGORY_ACTIVE NON È VUOTO, L'UTENTE STA MODIFICANDO UNA TASK_CATEGORY
 
                 // EFFETTUO LA CHIAMATA PUT PER MODIFICARE LA TASK_CATEGORY
-                axios.put(`${this.store.baseUrl}/api/tasks/categories/${this.taskCategoryActive.id}`, this.newTaskCategory).then(() => {
+                axios.put(`${this.store.baseUrl}/api/todolist/categories/${this.taskCategoryActive.id}`, this.newTaskCategory).then(() => {
 
                     // RESETTO LE VARIABILI DI APPOGGIO E AGGIORNO LE CATEGORIE
                     this.cancelTaskCategoryFormModal();
@@ -120,20 +119,20 @@ export default {
         /*
             FINE GESTIONE TASK_CATEGORY FORM
         */
-        showConfirmDeleteTaskCategoryModal(taskCategory){
+        showConfirmDeleteTaskCategoryModal(taskCategory) {
             this.taskCategoryActive = taskCategory;
         },
-        cancelConfirmDeleteTaskCategoryModal(){
+        cancelConfirmDeleteTaskCategoryModal() {
             this.taskActive = {};
             this.getTasks();
             this.getTasksCategories();
         },
-        deleteTaskCategory(id){
+        deleteTaskCategory(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA DELETE PER CANCELLARE LA TASK
-            axios.delete(`${this.store.baseUrl}/api/tasks/categories/${id}`).then(() => {
+            axios.delete(`${this.store.baseUrl}/api/todolist/categories/${id}`).then(() => {
 
                 this.cancelConfirmDeleteTaskCategoryModal();
 
@@ -159,7 +158,8 @@ export default {
             <div class="container-fluid my-5">
                 <div class="row">
                     <div class="col-12">
-                        <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`" @click="$emit('close-page')"></i>
+                        <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`"
+                            @click="$emit('close-page')"></i>
                     </div>
                 </div>
             </div>
@@ -175,14 +175,14 @@ export default {
                             </div>
                             <!-- CREATE TASK CATEGORY BUTTON -->
                             <div class="col-6 text-end px-5">
-                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#taskCategoryFormModal"
-                                    @click="showTaskCategoryFormModal({})">
+                                <button class="btn btn-success" data-bs-toggle="modal"
+                                    data-bs-target="#taskCategoryFormModal" @click="showTaskCategoryFormModal({})">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <!-- TABLE TASK CATEGORIES -->
+                    <!-- TASK CATEGORIES TABLE -->
                     <div class="col-12 mt-5">
                         <table class="table table-hover text-center">
                             <!-- TABLE HEADER -->
@@ -194,25 +194,29 @@ export default {
                             </thead>
                             <!-- TABLE BODY -->
                             <tbody>
-                                <!-- TASK CATEGORIES ROWS -->
-                                <tr role="button" v-for="taskCategory in tasksCategories" :key="taskCategory.id">
-                                    <!-- TASK CATEGORIES TITLE -->
+                                <!-- TASK CATEGORY ROW -->
+                                <tr v-for="taskCategory in store.todolist.tasksCategories" :key="taskCategory.id">
+                                    <!-- TITLE -->
                                     <td v-text="taskCategory.title"></td>
-                                    <!-- TASK CATEGORIES TOOLS -->
+                                    <!-- TOOLS -->
                                     <td>
                                         <!-- BUTTON EDIT -->
-                                        <button class="btn btn-warning mx-1" data-bs-toggle="modal" data-bs-target="#taskCategoryFormModal" @click="showTaskCategoryFormModal(taskCategory)">
+                                        <button class="btn btn-warning mx-1" data-bs-toggle="modal"
+                                            data-bs-target="#taskCategoryFormModal"
+                                            @click="showTaskCategoryFormModal(taskCategory)">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <!-- BUTTON DELETE -->
-                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteTaskCategoryModal" @click="showConfirmDeleteTaskCategoryModal(taskCategory)">
+                                        <button class="btn btn-danger mx-1" data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteTaskCategoryModal"
+                                            @click="showConfirmDeleteTaskCategoryModal(taskCategory)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
-                                <!-- TASK EMPTY MESSAGE -->
-                                <tr v-if="!tasksCategories.length">
-                                    <td colspan="5" class="text-center py-4">Nessuna categoria</td>
+                                <!-- TASK CATEGORIES EMPTY MESSAGE -->
+                                <tr v-if="!store.todolist.tasksCategories.length">
+                                    <td colspan="2" class="text-center py-4">Nessuna categoria trovata</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -220,7 +224,8 @@ export default {
                 </div>
             </div>
             <!-- TASK CATEGORY TOOLS MODAL -->
-            <div class="modal modal-xl fade my-lg-5" id="taskCategoryFormModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="taskCategoryFormModalLabel" aria-hidden="true">
+            <div class="modal modal-xl fade my-lg-5" id="taskCategoryFormModal" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="taskCategoryFormModalLabel" aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
@@ -228,7 +233,8 @@ export default {
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
-                            <h1 class="modal-title fs-5" id="taskCategoryFormModalLabel" v-text="taskCategoryFormTitle"></h1>
+                            <h1 class="modal-title fs-5" id="taskCategoryFormModalLabel" v-text="taskCategoryFormTitle">
+                            </h1>
                             <!-- BUTTON CLOSE -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 @click="cancelTaskCategoryFormModal"></button>
@@ -244,8 +250,9 @@ export default {
                             <!-- INPUT TITOLO -->
                             <div class="input-group">
                                 <label class="input-group-text" for="task-title">Titolo*</label>
-                                <input type="text" class="form-control" id="task-title" placeholder="Inserisci il titolo"
-                                    v-model="newTaskCategory.title" @keyup.enter="taskCategorySubmitForm">
+                                <input type="text" class="form-control" id="task-title"
+                                    placeholder="Inserisci il titolo" v-model="newTaskCategory.title"
+                                    @keyup.enter="taskCategorySubmitForm">
                             </div>
                         </div>
                         <!-- MODAL FOOTER -->
@@ -257,14 +264,16 @@ export default {
                             <button type="button" class="btn"
                                 :class="!Object.keys(taskCategoryActive).length ? 'btn-success' : 'btn-warning'"
                                 @click="taskCategorySubmitForm">{{
-                                !Object.keys(taskCategoryActive).length ? 'Crea' : 'Modifica'
-                                }}</button>
+        !Object.keys(taskCategoryActive).length ? 'Crea' : 'Modifica'
+    }}</button>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- CONFIRM DELETE TASK CATEGORY MODAL -->
-            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskCategoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteTaskCategoryModalLabel" aria-hidden="true">
+            <div class="modal modal-xl fade my-lg-5" id="confirmDeleteTaskCategoryModal" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmDeleteTaskCategoryModalLabel"
+                aria-hidden="true">
                 <!-- MODAL DIALOG -->
                 <div class="modal-dialog">
                     <!-- MODAL CONTENT -->
@@ -272,7 +281,8 @@ export default {
                         <!-- MODAL HEADER -->
                         <div class="modal-header">
                             <!-- MODAL TITLE -->
-                            <h1 class="modal-title fs-5" id="confirmDeleteTaskCategoryModalLabel">Conferma eliminazione categoria</h1>
+                            <h1 class="modal-title fs-5" id="confirmDeleteTaskCategoryModalLabel">Conferma eliminazione
+                                categoria</h1>
                             <!-- BUTTON CLOSE -->
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 @click="cancelConfirmDeleteTaskCategoryModal()"></button>

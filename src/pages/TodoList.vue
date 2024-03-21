@@ -7,20 +7,13 @@ import TaskCategoryIndex from '../components/todolist/TaskCategoryIndex.vue';
 
 export default {
     inject: ['theme'],
-    components:{
+    components: {
         TaskIndex,
         TaskCategoryIndex,
     },
     data() {
         return {
             store,
-
-            tasksNotDone: [],
-            tasksDone: [],
-
-            tasksCategories: [],
-
-            taskNotDoneCounter: 0,
 
             isTaskIndexActive: false,
             isTaskCategoryIndexActive: false,
@@ -29,7 +22,6 @@ export default {
     mounted() {
         this.getTasks();
         this.getTasksCategories();
-        this.getTasksNotDoneCounter();
     },
     methods: {
         getTasks() {
@@ -37,11 +29,11 @@ export default {
             this.store.loading = true;
 
             // SVUOTO GLI ARRAY DELLE TASKS
-            this.tasksNotDone = [];
-            this.tasksDone = [];
+            this.store.todolist.tasksNotDone = [];
+            this.store.todolist.tasksDone = [];
 
             // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DI TASKS
-            axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
+            axios.get(`${this.store.baseUrl}/api/todolist/tasks`).then((response) => {
 
                 // DICHIARO GLI ARRAY PER SUDDIVIDERE LE TASK
                 let rawTasksNotDone = [];
@@ -57,7 +49,7 @@ export default {
                 });
 
                 // MAPPO L'ARRAY DELLE "TASKS_NOT_DONE"
-                this.tasksNotDone = rawTasksNotDone.map(task => ({
+                this.store.todolist.tasksNotDone = rawTasksNotDone.map(task => ({
                     // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
                     ...task,
                     // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
@@ -67,7 +59,7 @@ export default {
                 }));
 
                 // MAPPO L'ARRAY DELLE "TASKS_DONE"
-                this.tasksDone = rawTasksDone.map(task => ({
+                this.store.todolist.tasksDone = rawTasksDone.map(task => ({
                     // IN QUESTO MODO MANTENGO TUTTE LE PROPRIETA GIA ESISTENTI
                     ...task,
                     // AGGIUNGO LA PROPRIETA "FORMATTED_DATE"
@@ -75,6 +67,9 @@ export default {
                     // AGGIUNGO LA PROPRIETA "FORMATTED_TIME"
                     formattedTime: this.formatItalianTime(task.time),
                 }));
+
+                // SALVO LA QUANTITA DI TASKS NON COMPLETATE
+                this.store.todolist.taskNotDoneCounter = this.store.todolist.tasksNotDone.length;
 
                 // FERMO IL LOADING
                 this.store.loading = false;
@@ -89,10 +84,10 @@ export default {
             this.store.loading = true;
 
             // EFFETTUO LA CHIAMATA GET PER OTTENERE LA LISTA DELLE TASKS_CATEGORIES
-            axios.get(`${this.store.baseUrl}/api/tasks/categories`).then((response) => {
+            axios.get(`${this.store.baseUrl}/api/todolist/categories`).then((response) => {
 
                 // SALVO IL RISULTATO IN TASKS_CATEGORIES
-                this.tasksCategories = response.data;
+                this.store.todolist.tasksCategories = response.data;
 
                 // FERMO IL LOADING
                 this.store.loading = false;
@@ -102,29 +97,15 @@ export default {
                 console.error("Errore nella Chiamata API getTasksCategories: ", error);
             });
         },
-        getTasksNotDoneCounter(){
-
-            this.store.loading = true;
-
-            axios.get(`${this.store.baseUrl}/api/tasks`).then((response) => {
-
-                let taskNotDone = response.data.filter(task => !task.done);
-
-                this.taskNotDoneCounter = taskNotDone.length;
-
-                this.store.loading = false;
-
-            }).catch((error) => {
-                console.error("Errore nella Chiamata API getTasks: ", error);
-            });
-        },
-        toggleTaskIndex(){
+        toggleTaskIndex() {
             this.isTaskIndexActive = !this.isTaskIndexActive;
-            if(!this.isTaskIndexActive)
-                this.getTasksNotDoneCounter();
+            if (!this.isTaskIndexActive)
+                this.getTasks();
         },
-        toggleTaskCategoryIndex(){
+        toggleTaskCategoryIndex() {
             this.isTaskCategoryIndexActive = !this.isTaskCategoryIndexActive;
+            if (!this.isTaskCategoryIndexActive)
+                this.getTasksCategories();
         },
         formatItalianDate(originalDate) {
             const options = { day: "numeric", month: "numeric", year: "numeric" };
@@ -162,26 +143,18 @@ export default {
             <div class="container-fluid rounded-4 shadow my-5">
                 <div class="row py-5">
                     <div class="col-12 d-flex align-items-center px-4">
-                        <span v-if="!taskNotDoneCounter">Nessuna task da completare</span>
-                        <span v-else>Task da completare: {{ taskNotDoneCounter }}</span>
+                        <span v-if="!store.todolist.taskNotDoneCounter">Nessuna task da completare</span>
+                        <span v-else>Task da completare: {{ store.todolist.taskNotDoneCounter }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- TASK-INDEX -->
-    <task-index v-if="!store.loading && isTaskIndexActive"
-    :tasksNotDone="tasksNotDone"
-    :tasksDone="tasksDone"
-    :tasksCategories="tasksCategories"
-    :getTasks="getTasks"
-    @close-page="toggleTaskIndex()" />
+    <task-index v-if="!store.loading && isTaskIndexActive" :getTasks="getTasks" @close-page="toggleTaskIndex()" />
     <!-- TASK-CATEGORY-INDEX -->
-    <task-category-index v-if="!store.loading && isTaskCategoryIndexActive"
-    :tasksCategories="tasksCategories"
-    :getTasks="getTasks"
-    :getTasksCategories="getTasksCategories"
-    @close-page="toggleTaskCategoryIndex()" />
+    <task-category-index v-if="!store.loading && isTaskCategoryIndexActive" :getTasks="getTasks"
+        :getTasksCategories="getTasksCategories" @close-page="toggleTaskCategoryIndex()" />
 </template>
 
 <style lang="scss" scoped></style>
