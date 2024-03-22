@@ -66,6 +66,7 @@ export default {
                     </div>
                 </div>
             </div>
+            <!-- CONTAINER OF WALLETS -->
             <div class="container-fluid rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
@@ -99,7 +100,11 @@ export default {
                             </thead>
                             <!-- TABLE BODY -->
                             <tbody>
-                                <!-- WALLET ROW -->
+                                <!-- WALLETS EMPTY MESSAGE -->
+                                <tr v-if="!store.tracker.activeWallets.length">
+                                    <td colspan="4" class="text-center py-4">Nessun wallet trovato</td>
+                                </tr>
+                                <!-- ACTIVE WALLET ROW -->
                                 <tr v-for="wallet in store.tracker.activeWallets" :key="wallet.id">
                                     <!-- ACTIVE -->
                                     <td>
@@ -118,6 +123,7 @@ export default {
                                         </button>
                                     </td>
                                 </tr>
+                                <!-- DISABLED WALLET ROW -->
                                 <tr v-for="wallet in store.tracker.disabledWallets" :key="wallet.id"
                                     v-if="showDisabledWallets">
                                     <!-- ACTIVE -->
@@ -137,10 +143,6 @@ export default {
                                         </button>
                                     </td>
                                 </tr>
-                                <!-- WALLETS EMPTY MESSAGE -->
-                                <!-- <tr v-if="!store.tracker.activeWallets.length">
-                                    <td colspan="4" class="text-center py-4">Nessun wallet trovato</td>
-                                </tr> -->
                             </tbody>
                         </table>
                     </div>

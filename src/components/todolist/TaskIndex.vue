@@ -14,6 +14,8 @@ export default {
             todayDate: null,
             tomorrowDate: null,
 
+            showDoneTask: false,
+
             isTasksCategoriesEmpty: false,
 
             taskActive: {},
@@ -217,6 +219,9 @@ export default {
         /*
             FINE GESTIONE TASK DELETE
         */
+        toggleDoneTask() {
+            this.showDoneTask = !this.showDoneTask;
+        },
         toggleTaskDone(id) {
             // FACCIO PARTIRE IL LOADING
             this.store.loading = true;
@@ -239,16 +244,26 @@ export default {
 <template>
     <div class="main-content" v-if="!store.loading">
         <div class="container-fluid px-5">
-            <!-- CONTAINER OF RETURN BUTTON -->
+            <!-- CONTAINER OF RETURN BUTTON AND SHOW DONE TASK -->
             <div class="container-fluid my-5">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-6">
                         <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`"
                             @click="$emit('close-page')"></i>
                     </div>
+                    <div class="col-6 d-flex justify-content-end" v-if="store.todolist.tasksDone.length > 0">
+                        <div class="d-flex rounded-4 shadow p-3">
+                            <label class="mx-3">Task completate</label>
+                            <div class="form-check form-switch d-flex justify-content-center"
+                                @click="toggleDoneTask()">
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                    :checked="showDoneTask">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- CONTAINER TASKS NOT DONE -->
+            <!-- CONTAINER OF TASKS -->
             <div class="container-fluid rounded-4 shadow my-5">
                 <div class="row py-5">
                     <!-- HEADER -->
@@ -256,7 +271,7 @@ export default {
                         <div class="row">
                             <!-- TITLE -->
                             <div class="col-6 px-5">
-                                <h3>Da completare</h3>
+                                <h3>Tasks</h3>
                             </div>
                             <!-- CREATE TASK BUTTON -->
                             <div class="col-6 text-end px-5">
@@ -283,7 +298,11 @@ export default {
                             </thead>
                             <!-- TABLE BODY -->
                             <tbody>
-                                <!-- TASKS ROWS -->
+                                <!-- TASK EMPTY MESSAGE -->
+                                <tr v-if="!store.todolist.tasksNotDone.length">
+                                    <td colspan="6" class="text-center py-4">Nessuna task da completare</td>
+                                </tr>
+                                <!-- TASKS NOT DONE ROW -->
                                 <tr v-for="task in store.todolist.tasksNotDone" :key="task.id">
                                     <!-- TASK CHECKBOX -->
                                     <td>
@@ -318,41 +337,8 @@ export default {
                                         </button>
                                     </td>
                                 </tr>
-                                <!-- TASK EMPTY MESSAGE -->
-                                <tr v-if="!store.todolist.tasksNotDone.length">
-                                    <td colspan="6" class="text-center py-4">Nessuna task da completare</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- CONTAINER TASKS DONE -->
-            <div class="container-fluid rounded-4 shadow my-5">
-                <div class="row py-5">
-                    <!-- HEADER -->
-                    <div class="col-12 px-5">
-                        <!-- TITLE -->
-                        <h3>Completate</h3>
-                    </div>
-                    <!-- TABLE TASK -->
-                    <div class="col-12 mt-5">
-                        <table class="table table-hover text-center">
-                            <!-- TABLE HEADER -->
-                            <thead>
-                                <tr>
-                                    <th scope="col">Completata</th>
-                                    <th scope="col">Categoria</th>
-                                    <th scope="col">Titolo</th>
-                                    <th scope="col">Data</th>
-                                    <th scope="col">Ora</th>
-                                    <th scope="col">Strumenti</th>
-                                </tr>
-                            </thead>
-                            <!-- TABLE BODY -->
-                            <tbody>
-                                <!-- TASK ROW -->
-                                <tr v-for="task in store.todolist.tasksDone" :key="task.id">
+                                <!-- TASKS DONE ROW -->
+                                <tr v-for="task in store.todolist.tasksDone" :key="task.id" v-if="showDoneTask">
                                     <!-- TASK CHECKBOX -->
                                     <td>
                                         <input type="checkbox" role="button" class="form-check-input" :name="task.title"
@@ -385,10 +371,6 @@ export default {
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
-                                </tr>
-                                <!-- TASK EMPTY MESSAGE -->
-                                <tr v-if="!store.todolist.tasksDone.length">
-                                    <td colspan="6" class="text-center py-4">Nessuna task completata</td>
                                 </tr>
                             </tbody>
                         </table>
