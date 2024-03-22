@@ -247,10 +247,12 @@ export default {
             <!-- CONTAINER OF RETURN BUTTON AND SHOW DONE TASK -->
             <div class="container-fluid my-5">
                 <div class="row">
+                    <!-- RETURN BUTTON -->
                     <div class="col-6">
                         <i class="icon fa-solid fa-circle-arrow-left fa-xl" :class="`${theme}-icon`"
                             @click="$emit('close-page')"></i>
                     </div>
+                    <!-- SHOW DONE TASK -->
                     <div class="col-6 d-flex justify-content-end" v-if="store.todolist.tasksDone.length > 0">
                         <div class="d-flex rounded-4 shadow p-3">
                             <label class="mx-3">Task completate</label>
