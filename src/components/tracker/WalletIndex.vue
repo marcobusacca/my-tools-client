@@ -17,7 +17,7 @@ export default {
             walletFormTitle: null,
             newWallet: {
                 name: "",
-                balance: 0,
+                balance: "",
             },
             formErrors: {},
         }
